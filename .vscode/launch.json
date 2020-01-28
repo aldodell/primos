@@ -1,0 +1,145 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Iniciar primos.out",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/primos.out",
+            "args": [
+                "-f:primos.bin",
+                "-l",
+                "-z"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "Iniciar pruebas.out",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/pruebas.out",
+            "args": [
+                "-f:primos-temp.bin",
+                "-t:120",
+                "-p",
+                "-n:100"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "Iniciar tirado.out",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/tirado.out",
+            "args": [
+                "-f:primos50mmm.bin",
+                "-b:2"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "Launch SPG",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/segmentedPrimeGenerator.out",
+            "args": [
+                "-n:100",
+                "-d:10",
+                "-b:2",
+                "-e:1000",
+                "-s:2",
+                "-g",
+                "-f"
+            ]
+        },
+        {
+            "name": "Launch ESS",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/ess.out",
+            "args": [
+                "-n:100",
+                "-d:10",
+                "-b:2",
+                "-e:1000",
+                "-s:2",
+                "-g",
+                "-f"
+            ]
+        },
+        {
+            "name": "Launch essGmp",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/essGmp.out",
+            "args": [
+                "-e:8",
+                "-g"
+            ]
+        },
+        {
+            "name": "Launch BigGearFactorizer",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/bigGearsFactorizer.out",
+            "args": [
+                "-n:2305843009213693951"
+            ]
+        },
+        {
+            "name": "Launch primeTester",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/primeTester.out",
+            "args": [
+                "-n:33",
+                "-f",
+                "-d:10"
+            ]
+        },
+        {
+            "name": "Launch TIRADO 2",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/tirado2.out",
+            "args": [
+                "-a:18",
+                "-b:20",
+                "-d:10"
+            ]
+        },
+        {
+            "name": "Launch TIRADO 3",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/tirado3.out",
+            "args": [
+                "-a:18",
+                "-b:20",
+                "-d:10"
+            ]
+        }
+    ]
+}

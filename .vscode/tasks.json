@@ -1,0 +1,314 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build primos with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "primeGenerator.cpp",
+                "factorizer.cpp",
+                "primos.cpp",
+                "-o",
+                "primos.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "Build Tirado with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "primeGenerator.cpp",
+                "factorizer.cpp",
+                "tirado.cpp",
+                "-o",
+                "tirado.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build Pruebas with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                //"argumentsHandler.cpp",
+                //"bigFactorObject.cpp",
+                //"bigGearsFactorizer.cpp",
+                "pruebas.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                //"-lmpir",
+                "-o",
+                "pruebas.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build gearsFactorizer with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "factorObject.cpp",
+                "argumentsHandler.cpp",
+                //"primeGenerator.cpp",
+                //"factorizer.cpp",
+                //"maths_prime.cpp",
+                "gearsFactorizer.cpp",
+                //"-lgmpxx",
+                //"-lgmp",
+                "-o",
+                "gearsFactorizer.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build mersenne with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "mersenne.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                "-o",
+                "mersenne.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build segmentedPrimeGenerator with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "--debug",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "segmentedPrimeGenerator.cpp",
+                "-o",
+                "segmentedPrimeGenerator.out"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build ESS with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "--debug",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "ess.cpp",
+                "-o",
+                "ess.out"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build ESS GMP with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                "--debug",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "essGmp.cpp",
+                "-o",
+                "essGmp.out"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build bigGearsFactorizer with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-DPRIME_TESTER_LIB=lib",
+                "kdutils.cpp",
+                "bigFactorObject.cpp",
+                "argumentsHandler.cpp",
+                "primeTester.cpp",
+                "bigGearsFactorizer.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                "-o",
+                "bigGearsFactorizer.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build primerTester with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                //"bigFactorObject.cpp",
+                //"bigGearsFactorizer.cpp",
+                "argumentsHandler.cpp",
+                //"primeGenerator.cpp",
+                //"factorizer.cpp",
+                //"maths_prime.cpp",
+                "primeTester.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                //"-DBIG_GEARS_FACTORIZER_LIB=lib",
+                "-o",
+                "primeTester.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build TIRADO 2 with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "primeTester.cpp",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "maths_prime.cpp",
+                "tirado2.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                "-o",
+                "tirado2.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build TIRADO 3 with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "maths_prime.cpp",
+                "primeTester.cpp",
+                "bigFactorObject.cpp",
+                "bigGearsFactorizer.cpp",
+                "tirado3.cpp",
+                "-DBIG_GEARS_FACTORIZER_LIB=lib",
+                "-o",
+                "tirado3.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        }
+    ]
+}
