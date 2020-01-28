@@ -10,7 +10,7 @@ int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y);
 
 class bigGearsFactorizer {
 public:
-  bigGearsFactorizer();
+  bigGearsFactorizer(primeTester *tester);
   ~bigGearsFactorizer();
   vector<mpz_class> factors;
   void clear();

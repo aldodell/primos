@@ -4,9 +4,10 @@
 #include "kdutils.h"
 #include "primeTester.h"
 #include "bigGearsFactorizer.h"
+#include "mersenne.h"
 #include <gmpxx.h>
 
-string aldo(int exponent);
+void aldo();
 
 
 

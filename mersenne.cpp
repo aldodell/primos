@@ -13,6 +13,7 @@ string mersenne(int64 p)
     return m.get_str();
 }
 
+#ifndef MERSENNE_LIB
 int main(int argc, char *argv[])
 {
 
@@ -42,3 +43,4 @@ int main(int argc, char *argv[])
     cout << mersenne(n) << endl;
     exit(0);
 }
+#endif

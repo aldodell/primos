@@ -4,9 +4,11 @@ int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y) {
   return x.base < y.base;
 }
 
-bigGearsFactorizer::bigGearsFactorizer() { this->tester = new primeTester(0); }
+bigGearsFactorizer::bigGearsFactorizer(primeTester *tester) {
+  this->tester = tester;
+}
 
-bigGearsFactorizer::~bigGearsFactorizer() { delete this->tester; }
+bigGearsFactorizer::~bigGearsFactorizer() {}
 
 void bigGearsFactorizer::clear() { this->factors.clear(); }
 
@@ -133,7 +135,8 @@ int main(int argc, char *argv[]) {
 
   // argument handler:
   argumentsHandler argHdl(argc, argv);
-  bigGearsFactorizer gf;
+  primerTester pt(0);
+  bigGearsFactorizer gf(pt);
   int action = 0;
   int debugLevel = 0;
   mpz_class n;
