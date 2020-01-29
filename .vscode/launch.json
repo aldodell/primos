@@ -141,5 +141,18 @@
                 "-d:10"
             ]
         }
+        ,
+        {
+            "name": "Launch Aldo",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/aldo.out",
+            "args": [
+                "-a:18",
+                "-b:20",
+                "-d:10"
+            ]
+        }
     ]
 }

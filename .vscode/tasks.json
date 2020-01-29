@@ -309,6 +309,37 @@
             "problemMatcher": [
                 "$eslint-stylish"
             ]
+        },
+        {
+            "label": "Build Aldo with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-DPRIME_TESTER_LIB=lib",
+                "-DBIG_GEARS_FACTORIZER_LIB=lib",
+                "-DMERSENNE_LIB=lib",
+                "kdutils.cpp",
+                "bigFactorObject.cpp",
+                "argumentsHandler.cpp",
+                "primeTester.cpp",
+                "bigGearsFactorizer.cpp",
+                "mersenne.cpp",
+                "aldo.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                "-o",
+                "aldo.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
         }
     ]
 }

@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
 
   // argument handler:
   argumentsHandler argHdl(argc, argv);
-  primerTester pt(0);
+  primeTester *pt(0);
   bigGearsFactorizer gf(pt);
   int action = 0;
   int debugLevel = 0;
