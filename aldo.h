@@ -8,6 +8,7 @@
 #include <gmpxx.h>
 
 void aldo();
+void aldo2();
 
 
 

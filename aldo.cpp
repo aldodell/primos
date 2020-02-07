@@ -54,4 +54,31 @@ void aldo() {
   cout << "</body></html>" << endl;
 }
 
-int main(int argc, char *argv[]) { aldo(); }
+void aldo2() {
+
+  mpz_class k, p, two, q;
+  int i, r;
+  p = 2;
+  two = 2;
+  string rr;
+
+  for (i = 0; i < 10; i++) {
+
+    k = two;
+
+    for (q = 0; q < (p - 1); q++) {
+      k = k * two;
+    }
+
+    k = k - 1;
+    r = mpz_probab_prime_p(k.get_mpz_t(), 20);
+
+    // mpz_pow_ui(k.get_mpz_t(), two.get_mpz_t(), p.get_ui());
+    // k = k - 1;
+    r = mpz_probab_prime_p(k.get_mpz_t(), 20);
+    gmp_printf("2 ^ %Zd - 1 = %Zd. R=%d \r\n", p.get_mpz_t(), k.get_mpz_t(), r);
+    p = k;
+  }
+}
+
+int main(int argc, char *argv[]) { aldo2(); }
