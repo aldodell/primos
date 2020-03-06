@@ -112,7 +112,7 @@
             "terminal": "console",
             "program": "${workspaceRoot}/primeTester.out",
             "args": [
-                "-n:33",
+                "-n:170141183460469231731687303715884105727",
                 "-f",
                 "-d:10"
             ]
