@@ -311,6 +311,30 @@
             ]
         },
         {
+            "label": "Build TIRADO 4 with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "tirado4.cpp",
+                "-o",
+                "tirado4.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
             "label": "Build Aldo with Clang",
             "type": "shell",
             "command": "clang++",
