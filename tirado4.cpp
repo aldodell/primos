@@ -2,28 +2,34 @@
 
 void calculate(int exponent) {
 
+
   vector<factor> factors;
   vector<int> factorials;
 
-  int evenN = exponent - 1;
-  int k;
+  int64 evenN = pow(2, exponent) - 2;
+  int64 max = evenN + 1;
 
-  int modK;
-  int exp = 1;
-  int pow2;
+  int64 k;
+
+  int64 modK;
+  int64 exp = 1;
+  int64 pow2;
+  factorials.push_back(max - 2);
 
   while (true) {
     while (true) {
 
       pow2 = pow(2, exp);
-      modK = evenN % (int)pow2;
+      modK = evenN % pow2;
       if (modK == 0) {
         k = evenN / pow2;
         factor f;
         f.base = 2;
         f.exp = exp * (((evenN - pow2) / (2 * pow2)) + 1);
         factors.push_back(f);
-        factorials.push_back(k);
+        if (k > 1) {
+          factorials.push_back(k);
+        }
         evenN -= 2;
         break;
       }
@@ -31,7 +37,7 @@ void calculate(int exponent) {
     }
 
     exp++;
-    if (pow(2, exp) > exponent)
+    if (pow(2, exp) > max)
       break;
   }
 
@@ -39,11 +45,20 @@ void calculate(int exponent) {
   for (int i = 0; i < factors.size(); i++) {
     sumExp += factors[i].exp;
   }
-  factorials.push_back(exponent - 1);
-  string fs;
-  
 
-  printf("2^%d x %s", sumExp, "");
+  string fs = "";
+
+  for (int i = 0; i < factorials.size(); i++) {
+    fs = fs + to_string(factorials[i]) + "! x";
+    // fs.push_back(factorials[i]);
+  }
+
+  // std::stringstream result;
+  // std::copy(fs.begin(), fs.end(), std::ostream_iterator<int>(result, "! x
+  // "));
+  // result.str().c_str()
+  printf("2^%d x %s", sumExp, fs.c_str());
+  cout << endl;
 }
 
 int main(int argc, char *argv[]) {

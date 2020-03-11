@@ -8,6 +8,7 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #define CALL_MEMBER_FN(object, ptrToMember) ((object).*(ptrToMember))
 
@@ -49,6 +50,10 @@ private:
   unsigned int cycles = 0;
   int index = 0;
 };
+
+std::string string_join(const std::vector<std::string>& elements, const char* const separator);
+
+
 
 #define KDUTILS_H
 #endif

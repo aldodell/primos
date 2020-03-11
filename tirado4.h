@@ -3,6 +3,7 @@
 #include "argumentsHandler.h"
 #include "kdutils.h"
 #include "string"
+#include <gmpxx.h>
 
 struct factor {
   int base;
