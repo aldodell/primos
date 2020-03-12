@@ -148,7 +148,7 @@
             "terminal": "console",
             "program": "${workspaceRoot}/tirado4.out",
             "args": [
-                "-n:11"
+                "-n:7"
             ]
         },
         {

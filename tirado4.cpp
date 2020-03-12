@@ -2,46 +2,66 @@
 
 void calculate(int exponent) {
 
-
   vector<factor> factors;
-  vector<int> factorials;
+  vector<mpz_class> factorials;
 
-  int64 evenN = pow(2, exponent) - 2;
-  int64 max = evenN + 1;
+  mpz_class evenN = pow(2, exponent) - 2;
+  mpz_class max = evenN + 1;
+  mpz_class tmpMax;
 
-  int64 k;
+  mpz_class k;
 
-  int64 modK;
-  int64 exp = 1;
-  int64 pow2;
+  mpz_class modK;
+  mpz_class exp = 1;
+  mpz_class pow2;
+  mpz_class pow2b;
+  
+  mpz_class two = 2;
+
   factorials.push_back(max - 2);
 
   while (true) {
+    // Store on pow2 the expression: 2^exp
+    mpz_pow_ui(pow2.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
+    // tmpMax = pow2;
+
     while (true) {
 
-      pow2 = pow(2, exp);
+      // Get module between evenN and pow2
       modK = evenN % pow2;
+      // If module == 0 then proccess:
       if (modK == 0) {
+
         k = evenN / pow2;
+        // Save power expression
         factor f;
+        // base
         f.base = 2;
+        // Exponent
         f.exp = exp * (((evenN - pow2) / (2 * pow2)) + 1);
+        // Save it
         factors.push_back(f);
+        // if (evenN / pow2) > 1 save it
         if (k > 1) {
           factorials.push_back(k);
         }
+        // Decrease evenN
         evenN -= 2;
         break;
       }
       evenN -= 2;
     }
 
+    // Increase exponent
     exp++;
-    if (pow(2, exp) > max)
+    // Save on tmpMax 2^exp
+    // If tmpMax > max then exit
+    mpz_pow_ui(tmpMax.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
+    if (tmpMax > max)
       break;
   }
 
-  int sumExp = 0;
+  mpz_class sumExp = 0;
   for (int i = 0; i < factors.size(); i++) {
     sumExp += factors[i].exp;
   }
@@ -49,15 +69,17 @@ void calculate(int exponent) {
   string fs = "";
 
   for (int i = 0; i < factorials.size(); i++) {
-    fs = fs + to_string(factorials[i]) + "! x";
+    fs = fs + factorials[i].get_str() + "! * ";
     // fs.push_back(factorials[i]);
   }
+  fs.pop_back();
+  fs.pop_back();
 
   // std::stringstream result;
   // std::copy(fs.begin(), fs.end(), std::ostream_iterator<int>(result, "! x
   // "));
   // result.str().c_str()
-  printf("2^%d x %s", sumExp, fs.c_str());
+  gmp_printf("2^%Zd x %s", sumExp.get_mpz_t(), fs.c_str());
   cout << endl;
 }
 
@@ -73,18 +95,29 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(1, (char *)"d", (char *)"debug", (char *)"Debug level",
                       (char *)"N"));
 
+  argHdl.add(argument(2, (char *)"u", (char *)"until",
+                      (char *)"Process from 3 until N", (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
     switch (action) {
     case 0:
       argHdl.pvalue(&exponent);
-      //  n = argHdl.value;
+      calculate(exponent);
+      cout << endl;
       break;
     case 1:
       argHdl.pvalue(&debugLevel);
       break;
+
+    case 2:
+      argHdl.pvalue(&exponent);
+      for (int i = 3; i <= exponent; i += 2) {
+        printf("2^%d-1: ", i);
+        calculate(i);
+        cout << endl;
+      }
+      break;
     }
   }
-
-  calculate(exponent);
 }

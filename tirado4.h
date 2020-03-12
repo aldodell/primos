@@ -6,8 +6,8 @@
 #include <gmpxx.h>
 
 struct factor {
-  int base;
-  int exp;
+  mpz_class base;
+  mpz_class exp;
 };
 
 void calculate(int exp);
