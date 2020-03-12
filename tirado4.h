@@ -10,5 +10,7 @@ struct factor {
   mpz_class exp;
 };
 
-void calculate(int exp);
+void tirado4a(int exponent, int debugLevel=0);
+void tirado4b(int exponent, int debugLevel=0);
+
 #endif

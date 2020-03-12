@@ -1,62 +1,75 @@
 #include "tirado4.h"
 
-void calculate(int exponent) {
+void tirado4a(int exponent, int debugLevel) {
 
   vector<factor> factors;
   vector<mpz_class> factorials;
 
-  mpz_class evenN = pow(2, exponent) - 2;
-  mpz_class max = evenN + 1;
-  mpz_class tmpMax;
-
+  mpz_class evenN;
+  // mpz_class max = evenN + 1;
+  // mpz_class tmpMax;
   mpz_class k;
-
   mpz_class modK;
   mpz_class exp = 1;
   mpz_class pow2;
-
   mpz_class two = 2;
+  bool done = false;
 
-  factorials.push_back(max - 2);
+  // = pow(2, exponent) - 2;
+
+  // Get 2^exponent (from argument function caller)
+  mpz_pow_ui(evenN.get_mpz_t(), two.get_mpz_t(), exponent);
+  // Save 2^exponent
+  // tmpMax = evenN;
+  // Set even value: (2^exponent - 1) -1
+  evenN = evenN - 2;
+
+  factorials.push_back(evenN - 1);
 
   while (true) {
-    // Store on pow2 the expression: 2^exp
+    // Set pivot factor 2^exp
     mpz_pow_ui(pow2.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
-    // tmpMax = pow2;
 
+    // cout << endl;
     while (true) {
-
-      // Get module between evenN and pow2
+      // Evaluate if evenN is divisible by 2^exp
       modK = evenN % pow2;
-      // If module == 0 then proccess:
       if (modK == 0) {
 
         k = evenN / pow2;
-        // Save power expression
         factor f;
-        // base
         f.base = 2;
-        // Exponent
         f.exp = exp * (((evenN - pow2) / (2 * pow2)) + 1);
-        // Save it
+        // cout << f.exp << endl;
+
+        if (debugLevel > 0) {
+
+          gmp_printf("2^%Zd^{[(%Zd - %Zd) / %d] + 1} = %Zd", exp.get_mpz_t(),
+                     evenN.get_mpz_t(), pow2.get_mpz_t(), 2 * pow2.get_ui(),
+                     f.exp.get_mpz_t());
+          cout << endl;
+        }
+
         factors.push_back(f);
-        // if (evenN / pow2) > 1 save it
         if (k > 1) {
           factorials.push_back(k);
         }
-        // Decrease evenN
-        evenN -= pow2;
+        done = true;
+      }
+      // Decrease even N by 2^exp
+      evenN -= pow2;
+      if (done) {
+        done = false;
         break;
       }
-      evenN -= pow2;
+      // If is reached end, exit
+      if (evenN < pow2) {
+        break;
+      }
     }
 
-    // Increase exponent
     exp++;
-    // Save on tmpMax 2^exp
-    // If tmpMax > max then exit
-    mpz_pow_ui(tmpMax.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
-    if (tmpMax > max)
+    if (exp == exponent)
       break;
   }
 
@@ -69,7 +82,6 @@ void calculate(int exponent) {
 
   for (int i = 0; i < factorials.size(); i++) {
     fs = fs + factorials[i].get_str() + "! * ";
-    // fs.push_back(factorials[i]);
   }
   fs.pop_back();
   fs.pop_back();
@@ -82,13 +94,42 @@ void calculate(int exponent) {
   cout << endl;
 }
 
+void tirado4b(int exponent, int debugLevel) {
+
+  mpz_class k;
+  mpz_class value;
+  mpz_class pow2;
+  mpz_class modK;
+  int exp;
+  exp = 1;
+
+  mpz_ui_pow_ui(value.get_mpz_t(), 2, exponent);
+  value = value - 2;
+  cout << endl;
+
+  while (true) {
+    mpz_ui_pow_ui(pow2.get_mpz_t(), 2, exp);
+    modK = value % pow2;
+    if (modK == 0) {
+      k = value / pow2;
+      gmp_printf("2^%d-1-1 => 2^%d * %Zd", exponent, exp, k.get_mpz_t());
+      cout << endl;
+    }
+    value = value - pow2;
+    exp++;
+    if (exp == exponent)
+      break;
+  }
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent;
   int debugLevel;
   int action;
-  vector<int> primeTable{2,  3,  5,  7,  11, 13, 17, 19, 23, 29,
-                         31, 37, 41, 43, 47, 53, 59, 61, 67};
+  vector<int> primeTable{
+      2,  3,  5,  7,  11, 13, 17, 19, 23, 29,
+      31, 37, 41, 43, 47, 53, 59, 61}; //,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199};
 
   argHdl.add(argument(0, (char *)"n", (char *)"number",
                       (char *)"Number to be factorized", (char *)"N"));
@@ -102,12 +143,16 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(3, (char *)"p", (char *)"primes",
                       (char *)"Process only prime table", (char *)"N"));
 
+  argHdl.add(argument(4, (char *)"a", (char *)"aldo test",
+                      (char *)"Process only prime table", (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
     switch (action) {
     case 0:
       argHdl.pvalue(&exponent);
-      calculate(exponent);
+      printf("2^%d-1:\r\n", exponent);
+      tirado4a(exponent, debugLevel);
       cout << endl;
       break;
     case 1:
@@ -117,19 +162,27 @@ int main(int argc, char *argv[]) {
     case 2:
       argHdl.pvalue(&exponent);
       for (int i = 3; i <= exponent; i += 2) {
-        printf("2^%d-1: ", i);
-        calculate(i);
+        printf("2^%d-1:\r\n ", i);
+        tirado4a(i, debugLevel);
         cout << endl;
       }
       break;
 
     case 3:
-     // argHdl.pvalue(&exponent);
+      // argHdl.pvalue(&exponent);
       for (int i = 0; i < primeTable.size(); i++) {
-        printf("2^%d-1: ", primeTable[i]);
-        calculate(primeTable[i]);
+        printf("2^%d-1: \r\n", primeTable[i]);
+        tirado4a(primeTable[i], debugLevel);
         cout << endl;
       }
+      break;
+
+    case 4:
+      argHdl.pvalue(&exponent);
+      // for (int i = 0; i < primeTable.size(); i++) {
+      // printf("2^%d-1: \r\n", primeTable[i]);
+      tirado4b(exponent, debugLevel);
+
       break;
     }
   }

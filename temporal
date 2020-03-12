@@ -1206,3 +1206,49 @@ char z = this->lastDigit(n);
   r = (20 * block) + flag;
   return r;
   */
+
+
+
+
+  /*
+    while (true) {
+      // Store on pow2 the expression: 2^exp
+      mpz_pow_ui(pow2.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
+      // tmpMax = pow2;
+
+      while (true) {
+
+        // Get module between evenN and pow2
+        modK = evenN % pow2;
+        // If module == 0 then proccess:
+        if (modK == 0) {
+
+          k = evenN / pow2;
+          // Save power expression
+          factor f;
+          // base
+          f.base = 2;
+          // Exponent
+          f.exp = exp * (((evenN - pow2) / (2 * pow2)) + 1);
+          // Save it
+          factors.push_back(f);
+          // if (evenN / pow2) > 1 save it
+          if (k > 1) {
+            factorials.push_back(k);
+          }
+          // Decrease evenN
+          evenN -= pow2;
+          break;
+        }
+        evenN -= pow2;
+      }
+
+      // Increase exponent
+      exp++;
+      // Save on tmpMax 2^exp
+      // If tmpMax > max then exit
+      mpz_pow_ui(tmpMax.get_mpz_t(), two.get_mpz_t(), exp.get_ui());
+      if (tmpMax > max)
+        break;
+    }
+    */
