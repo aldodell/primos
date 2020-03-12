@@ -14,8 +14,7 @@ void calculate(int exponent) {
   mpz_class modK;
   mpz_class exp = 1;
   mpz_class pow2;
-  mpz_class pow2b;
-  
+
   mpz_class two = 2;
 
   factorials.push_back(max - 2);
@@ -46,10 +45,10 @@ void calculate(int exponent) {
           factorials.push_back(k);
         }
         // Decrease evenN
-        evenN -= 2;
+        evenN -= pow2;
         break;
       }
-      evenN -= 2;
+      evenN -= pow2;
     }
 
     // Increase exponent
@@ -88,6 +87,8 @@ int main(int argc, char *argv[]) {
   int exponent;
   int debugLevel;
   int action;
+  vector<int> primeTable{2,  3,  5,  7,  11, 13, 17, 19, 23, 29,
+                         31, 37, 41, 43, 47, 53, 59, 61, 67};
 
   argHdl.add(argument(0, (char *)"n", (char *)"number",
                       (char *)"Number to be factorized", (char *)"N"));
@@ -97,6 +98,9 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(2, (char *)"u", (char *)"until",
                       (char *)"Process from 3 until N", (char *)"N"));
+
+  argHdl.add(argument(3, (char *)"p", (char *)"primes",
+                      (char *)"Process only prime table", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -118,6 +122,17 @@ int main(int argc, char *argv[]) {
         cout << endl;
       }
       break;
+
+    case 3:
+     // argHdl.pvalue(&exponent);
+      for (int i = 0; i < primeTable.size(); i++) {
+        printf("2^%d-1: ", primeTable[i]);
+        calculate(primeTable[i]);
+        cout << endl;
+      }
+      break;
     }
   }
 }
+
+// 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. 31, 37, 41, 43, 47, 53, 59, 61, 67,
