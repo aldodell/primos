@@ -98,28 +98,164 @@ void tirado4b(int exponent, int debugLevel) {
 
   mpz_class k;
   mpz_class value;
-  mpz_class pow2;
+  mpz_class pow2, pow2b;
   mpz_class modK;
+  mpz_class dif;
   int exp;
   exp = 1;
+  pow2b = 0;
 
   mpz_ui_pow_ui(value.get_mpz_t(), 2, exponent);
   value = value - 2;
-  cout << endl;
 
   while (true) {
     mpz_ui_pow_ui(pow2.get_mpz_t(), 2, exp);
-    modK = value % pow2;
-    if (modK == 0) {
-      k = value / pow2;
-      gmp_printf("2^%d-1-1 => 2^%d * %Zd", exponent, exp, k.get_mpz_t());
-      cout << endl;
-    }
-    value = value - pow2;
+    dif = value - pow2b;
+    k = value / pow2;
+
+    gmp_printf("%Zd - %Zd = %Zd; %Zd / %Zd = %Zd = (2^%d - 1)\r\n",
+               value.get_mpz_t(), pow2b.get_mpz_t(), dif.get_mpz_t(),
+               dif.get_mpz_t(), pow2.get_mpz_t(), k.get_mpz_t(),
+               (exponent - exp));
+
+    if (k == 1)
+      break;
+    value = value - pow2b;
+    pow2b = pow2;
     exp++;
-    if (exp == exponent)
+  }
+}
+
+void tirado4c(int exponent, int debugLevel) {
+
+  mpz_class value, value2, oddFactor, mod;
+  mpz_ui_pow_ui(value.get_mpz_t(), 2, exponent);
+  value = value - 2;
+  int exp = 0;
+  int base = 2;
+  vector<factor> factors, factors2;
+
+  while (true) {
+    value2 = value;
+    base = 2;
+    while (true) {
+      factor f;
+      f.base = base;
+      while (true) {
+        mod = value2 % base;
+        if (mod == 0) {
+          value2 = value2 / base;
+          f.exp++;
+        } else {
+          base++;
+          break;
+        }
+      }
+      if (f.exp > 0) {
+        factors.push_back(f);
+      }
+      if (value2 == 1)
+        break;
+    }
+
+    value--;
+    if (value == 0)
       break;
   }
+
+  string fs = "";
+  int pos = -1;
+  int i, j;
+
+  sort(factors.begin(), factors.end(), compareFactors);
+
+  for (i = 0; i < factors.size(); i++) {
+    pos = -1;
+    for (j = 0; j < factors2.size(); j++) {
+      if (factors2[j].base == factors[i].base)
+        pos = j;
+    }
+    if (pos < 0) {
+      factors2.push_back(factors[i]);
+    } else {
+      factors2[pos].exp += factors[i].exp;
+    }
+  }
+
+  sort(factors2.begin(), factors2.end(), compareFactors);
+
+  for (factor f : factors2) {
+    fs = fs + f.base.get_str() + "^" + f.exp.get_str() + "\r\n";
+  }
+
+  cout << fs << endl;
+  cout << endl;
+}
+
+void tirado4d(int exponent, int debugLevel) {
+
+  mpz_class value, value2, oddFactor, mod;
+  mpz_ui_pow_ui(value.get_mpz_t(), 2, exponent);
+  value = value - 2;
+  int exp = 0;
+  int base = 2;
+  vector<factor> factors, factors2;
+
+  while (true) {
+    value2 = value;
+    base = 2;
+    while (true) {
+      factor f;
+      f.base = base;
+      while (true) {
+        mod = value2 % base;
+        if (mod == 0) {
+          value2 = value2 / base;
+          f.exp++;
+        } else {
+          base++;
+          break;
+        }
+      }
+      if (f.exp > 0) {
+        factors.push_back(f);
+      }
+      if (value2 == 1)
+        break;
+    }
+
+    value--;
+    if (value == 0)
+      break;
+  }
+
+  string fs = "";
+  int pos = -1;
+  int i, j;
+
+  sort(factors.begin(), factors.end(), compareFactors);
+
+  for (i = 0; i < factors.size(); i++) {
+    pos = -1;
+    for (j = 0; j < factors2.size(); j++) {
+      if (factors2[j].base == factors[i].base)
+        pos = j;
+    }
+    if (pos < 0) {
+      factors2.push_back(factors[i]);
+    } else {
+      factors2[pos].exp += factors[i].exp;
+    }
+  }
+
+  sort(factors2.begin(), factors2.end(), compareFactors);
+
+  for (factor f : factors2) {
+    fs = fs + f.base.get_str() + "^" + f.exp.get_str() + "\r\n";
+  }
+
+  cout << fs << endl;
+  cout << endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -144,6 +280,9 @@ int main(int argc, char *argv[]) {
                       (char *)"Process only prime table", (char *)"N"));
 
   argHdl.add(argument(4, (char *)"a", (char *)"aldo test",
+                      (char *)"Process only prime table", (char *)"N"));
+
+  argHdl.add(argument(5, (char *)"b", (char *)"aldo 2 test",
                       (char *)"Process only prime table", (char *)"N"));
 
   while (action > -1) {
@@ -184,8 +323,21 @@ int main(int argc, char *argv[]) {
       tirado4b(exponent, debugLevel);
 
       break;
+
+    case 5:
+      argHdl.pvalue(&exponent);
+      // for (int i = 0; i < primeTable.size(); i++) {
+      // printf("2^%d-1: \r\n", primeTable[i]);
+      tirado4c(exponent, debugLevel);
+
+      break;
     }
   }
+
+
+
+
+
 }
 
 // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. 31, 37, 41, 43, 47, 53, 59, 61, 67,

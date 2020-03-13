@@ -67,7 +67,8 @@
 			"utility": "cpp",
 			"*.tcc": "cpp",
 			"hashtable": "cpp",
-			"thread": "cpp"
+			"thread": "cpp",
+			"__memory": "cpp"
 		}
 	}
 }
