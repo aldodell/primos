@@ -142,16 +142,6 @@
             ]
         },
         {
-            "name": "Launch TIRADO 4",
-            "type": "lldb",
-            "request": "launch",
-            "terminal": "console",
-            "program": "${workspaceRoot}/tirado4.out",
-            "args": [
-                "-b:17"
-            ]
-        },
-        {
             "name": "Launch Aldo",
             "type": "lldb",
             "request": "launch",
@@ -160,6 +150,16 @@
             "args": [
                 "-a:18",
                 "-b:20",
+                "-d:10"
+            ]
+        },
+        {
+            "name": "TIRADO4",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/tirado4.out",
+            "args": [
                 "-d:10"
             ]
         }

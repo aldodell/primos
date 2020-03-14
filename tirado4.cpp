@@ -334,10 +334,15 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  mpz_class a, b, c;
 
-
-
-
+  a = semiFactorial(29) * semiFactorial(7) * 15 * 13 * 11 * 9 * 7 * 3;
+  b = a / 31;
+  c = a % 31;
+  
+  gmp_printf("%Zd \r\n %Zd \r\n %Zd", a.get_mpz_t(), b.get_mpz_t(),
+             c.get_mpz_t());
+  cout << endl;
 }
 
 // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. 31, 37, 41, 43, 47, 53, 59, 61, 67,

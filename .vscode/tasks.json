@@ -321,6 +321,7 @@
                 "-lgmp",
                 "kdutils.cpp",
                 "argumentsHandler.cpp",
+                "maths_prime.cpp",
                 "tirado4.cpp",
                 "-o",
                 "tirado4.out",
