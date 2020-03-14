@@ -334,14 +334,16 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  mpz_class a, b, c;
+  mpz_class a, b, c, d, r;
 
-  a = semiFactorial(29) * semiFactorial(7) * 15 * 13 * 11 * 9 * 7 * 3;
-  b = a / 31;
-  c = a % 31;
-  
-  gmp_printf("%Zd \r\n %Zd \r\n %Zd", a.get_mpz_t(), b.get_mpz_t(),
-             c.get_mpz_t());
+  a = (semiFactorial(29) * semiFactorial(7) * (15 * 13 * 11 * 9 * 7 * 3)) + 1;
+  b = 31;
+  c = a / b;
+  d = a % b;
+  mpz_mod(r.get_mpz_t(), a.get_mpz_t(), b.get_mpz_t());
+
+  gmp_printf("a=%Zd \r\n b=%Zd \r\n c=%Zd  \r\n d=%Zd \r\n r=%Zd", a.get_mpz_t(),
+             b.get_mpz_t(), c.get_mpz_t(), d.get_mpz_t(), r.get_mpz_t());
   cout << endl;
 }
 
