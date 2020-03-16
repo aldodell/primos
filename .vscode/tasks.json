@@ -225,6 +225,36 @@
                 "$eslint-stylish"
             ]
         },
+
+        
+        {
+            "label": "Build bigHalfGearFactorizer with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "bigFactorObject.cpp",
+                "argumentsHandler.cpp",
+                "bigHalfGearFactorizer.cpp",
+                "-lgmpxx",
+                "-lgmp",
+                "-o",
+                "bigHalfGearFactorizer.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+
+
+
         {
             "label": "Build primerTester with Clang",
             "type": "shell",
@@ -319,9 +349,15 @@
                 "-stdlib=libc++",
                 "-lgmpxx",
                 "-lgmp",
+                "-DPRIME_TESTER_LIB=lib",
+                "-DBIG_GEARS_FACTORIZER_LIB",
                 "kdutils.cpp",
                 "argumentsHandler.cpp",
                 "maths_prime.cpp",
+                "primeTester.cpp",
+                "bigFactorObject.cpp",
+                "bigGearsFactorizer.cpp",
+               // "factorizer.cpp",
                 "tirado4.cpp",
                 "-o",
                 "tirado4.out",

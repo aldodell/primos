@@ -1,8 +1,6 @@
 #ifndef PRIME_TESTER_H
 #define PRIME_TESTER_H
 #include "argumentsHandler.h"
-//#include "bigFactorObject.h"
-//#include "bigGearsFactorizer.h"
 #include "kdutils.h"
 #include <gmpxx.h>
 #define DATABASE_FILE "primeTesterDB.bin"

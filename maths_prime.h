@@ -13,5 +13,5 @@ int jacobi(int a, int n);
 void operatorTest();
 bool isOdd(int n);
 int64 factorial(int64 n);
-mpz_class semiFactorial(mpz_class n);
+mpz_class doubleFactorial(mpz_class n);
 #endif

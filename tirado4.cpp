@@ -258,6 +258,59 @@ void tirado4d(int exponent, int debugLevel) {
   cout << endl;
 }
 
+void tirado4e(int exponent, int debugLevel) {
+
+  mpz_class a, b, c, d, r, q;
+
+  mpz_ui_pow_ui(a.get_mpz_t(), 2, exponent);
+  a = a - 3;
+  b = ((a + 1) / 2) - 2;
+  c = (((b + 2) + 1) / 2) - 1;
+  d = a + 2;
+
+  r = doubleFactorial(a) * doubleFactorial(b) * doubleFactorial(c);
+
+  while (true) {
+    c = ((c + 1) / 2) - 1;
+    r = r * doubleFactorial(c);
+    if (c < 4)
+      break;
+  }
+
+  mpz_mod(q.get_mpz_t(), r.get_mpz_t(), d.get_mpz_t());
+  gmp_printf("r=%Zd \r\n d=%Zd \r\n q=%Zd \r\n", r.get_mpz_t(), d.get_mpz_t(),
+             q.get_mpz_t());
+}
+
+void tirado4f(int exponent, int debugLevel) {
+
+  // 11, 23, 29, 37,
+  vector<int> exponents{41, 43, 47, 53, 59};
+  mpz_class mersenne, f1, f2;
+
+  primeTester tester(100);
+  bigGearsFactorizer bgf(&tester);
+  bigGearsFactorizer bgf2(&tester);
+
+  for (int i = 0; i < exponents.size(); i++) {
+    int exp = exponents[i];
+    mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, exp);
+    mersenne--;
+    bgf.find(mersenne);
+    cout << "2^" << exp << "-1: " << bgf.toString() << endl;
+
+    for (int j = 0; j < bgf.factors.size(); j++) {
+      mpz_class f1 = bgf.factors[j];
+      f2 = (f1 - 1) / 2;
+      bgf2.find(f2);
+      cout << "\t Argument of (" << f1 << ") =: " << f2 << " = "
+           << bgf2.toString() << endl;
+      bgf2.clear();
+    }
+    bgf.clear();
+  }
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent;
@@ -284,6 +337,12 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(5, (char *)"b", (char *)"aldo 2 test",
                       (char *)"Process only prime table", (char *)"N"));
+
+  argHdl.add(argument(6, (char *)"e", (char *)"tirado 2 test",
+                      (char *)"Process only prime table", (char *)"N"));
+
+  argHdl.add(argument(7, (char *)"f", (char *)"F",
+                      (char *)"Mersenne factorizer", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -331,20 +390,47 @@ int main(int argc, char *argv[]) {
       tirado4c(exponent, debugLevel);
 
       break;
+
+    case 6:
+      argHdl.pvalue(&exponent);
+      // for (int i = 0; i < primeTable.size(); i++) {
+      // printf("2^%d-1: \r\n", primeTable[i]);
+      tirado4e(exponent, debugLevel);
+
+      break;
+
+    case 7:
+      argHdl.pvalue(&exponent);
+      tirado4f(exponent, debugLevel);
+
+      break;
     }
   }
 
-  mpz_class a, b, c, d, r;
+  /*
+    mpz_class a, b, c, d, r;
 
-  a = (semiFactorial(29) * semiFactorial(7) * (15 * 13 * 11 * 9 * 7 * 3)) + 1;
-  b = 31;
-  c = a / b;
-  d = a % b;
-  mpz_mod(r.get_mpz_t(), a.get_mpz_t(), b.get_mpz_t());
+    a = (doubleFactorial(29) * doubleFactorial(7) * (15 * 13 * 11 * 9 * 7 *
+    3))
+    + 1; b = 31; c = a / b; d = a % b; mpz_mod(r.get_mpz_t(), a.get_mpz_t(),
+    b.get_mpz_t());
 
-  gmp_printf("a=%Zd \r\n b=%Zd \r\n c=%Zd  \r\n d=%Zd \r\n r=%Zd", a.get_mpz_t(),
-             b.get_mpz_t(), c.get_mpz_t(), d.get_mpz_t(), r.get_mpz_t());
-  cout << endl;
+    gmp_printf("a=%Zd \r\n b=%Zd \r\n c=%Zd  \r\n d=%Zd \r\n r=%Zd",
+               a.get_mpz_t(), b.get_mpz_t(), c.get_mpz_t(), d.get_mpz_t(),
+               r.get_mpz_t());
+    cout << endl;
+
+    mpz_class e, f, g;
+
+    e = doubleFactorial(2045) * doubleFactorial(1021) * doubleFactorial(511) *
+        doubleFactorial(255) * doubleFactorial(127) * doubleFactorial(63) *
+        doubleFactorial(31) * doubleFactorial(15) * doubleFactorial(7) *
+        doubleFactorial(3);
+    f = 2047;
+    mpz_mod(g.get_mpz_t(), e.get_mpz_t(), f.get_mpz_t());
+    gmp_printf("e=%Zd \r\n f=%Zd \r\n g=%Zd", e.get_mpz_t(), f.get_mpz_t(),
+               g.get_mpz_t());
+               */
 }
 
 // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. 31, 37, 41, 43, 47, 53, 59, 61, 67,

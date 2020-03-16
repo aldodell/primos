@@ -142,10 +142,10 @@ int64 factorial(int64 n) {
   return 1;
 }
 
-mpz_class semiFactorial(mpz_class n) {
+mpz_class doubleFactorial(mpz_class n) {
   if (n < 2) {
     return 1;
   } else {
-    return n * semiFactorial(n - 2);
+    return n * doubleFactorial(n - 2);
   }
 }
