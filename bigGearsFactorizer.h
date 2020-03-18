@@ -6,7 +6,6 @@
 #include "primeTester.h"
 #include <gmpxx.h>
 
-int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y);
 
 class bigGearsFactorizer {
 public:

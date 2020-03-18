@@ -1252,3 +1252,25 @@ char z = this->lastDigit(n);
         break;
     }
     */
+
+
+ while (pivot <= root) {
+
+    while (true) {
+      mpz_mod(mod.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
+      if (mod > 0) {
+        break;
+      }
+      this->factors.push_back(pivot);
+      n /= pivot;
+    }
+    // dPivot = pivot * pivot;
+    pivot += 2;
+    //  if (dPivot > n) {
+    if (pivot >= n) {
+      if (n > 1) {
+        this->factors.push_back(n);
+      }
+      break;
+    }
+  }

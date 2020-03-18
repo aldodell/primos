@@ -1,8 +1,6 @@
 #include "bigGearsFactorizer.h"
 
-int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y) {
-  return x.base < y.base;
-}
+
 
 bigGearsFactorizer::bigGearsFactorizer(primeTester *tester) {
   this->tester = tester;

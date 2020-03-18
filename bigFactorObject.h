@@ -11,4 +11,6 @@ public:
   bigFactorObject(mpz_class base, int exponent);
 };
 
+int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y);
+
 #endif

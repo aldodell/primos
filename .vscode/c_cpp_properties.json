@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "~/Desktop/cpp/primos/"
             ],
             "defines": [],
             "macFrameworkPath": [

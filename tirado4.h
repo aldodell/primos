@@ -7,6 +7,7 @@
 #include "string"
 #include "bigFactorObject.h"
 #include "bigGearsFactorizer.h"
+#include "bigHalfGearFactorizer.h"
 #include "primeTester.h"
 #include <gmpxx.h>
 
@@ -23,5 +24,10 @@ void tirado4b(int exponent, int debugLevel = 0);
 void tirado4c(int exponent, int debugLevel = 0);
 void tirado4e(int exponent, int debugLevel = 0);
 void tirado4f(int exponent, int debugLevel = 0);
+void tirado4h(int exponent, int debugLevel = 0);
+void tirado4i(int exponent, int debugLevel = 0);
+void tirado4j(int exponent, int debugLevel = 0);
+void tirado4k(int exponent, int debugLevel = 0);
+void tirado4l(int exponent, int debugLevel = 0);
 
 #endif

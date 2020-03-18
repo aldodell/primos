@@ -5,7 +5,7 @@ No usa base de datos previos
 */
 
 void bigHalfGearFactorizer::find(mpz_class n) {
-  mpz_class root, pivot, mod;
+  mpz_class pivot, mod, root;
 
   // Filter "2" factors (for discard parity)
   while (true) {
@@ -21,36 +21,41 @@ void bigHalfGearFactorizer::find(mpz_class n) {
   if (n == 1)
     return;
 
-  // Get square root of n
-  mpz_root(root.get_mpz_t(), n.get_mpz_t(), 2);
-
+  // Next pivot value
   pivot = 3;
+  // square root of number to be factorized
+  mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
 
-  // iterate to find a factor of n
-  while (pivot <= root) {
+  while (true) {
 
     while (true) {
       mpz_mod(mod.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
       if (mod > 0) {
         break;
+        mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
       }
-      this->factors.push_back(pivot);
       n /= pivot;
+      this->factors.push_back(pivot);
+
+      if (n == 1) {
+        break;
+      }
     }
+
+    if (n == 1) {
+      break;
+    }
+
+    if (pivot > root) {
+      this->factors.push_back(n);
+      break;
+    }
+
     pivot += 2;
   }
-
-  if (n > root) {
-    this->factors.push_back(n);
-  }
-  mpz_root(root.get_mpz_t(), n.get_mpz_t(), 2);
 }
 
 void bigHalfGearFactorizer::clear() { this->factors.clear(); }
-
-int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y) {
-  return x.base < y.base;
-}
 
 string bigHalfGearFactorizer::toString() {
   vector<bigFactorObject> objects;
@@ -87,7 +92,7 @@ string bigHalfGearFactorizer::toString() {
     }
     i++;
     if (i < objects.size()) {
-      s = s + " x ";
+      s = s + "*";
     }
   }
 

@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include <gmpxx.h>
 
-int bigFactorObjectCompare(bigFactorObject x, bigFactorObject y);
 
 class bigHalfGearFactorizer {
 public:
