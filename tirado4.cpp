@@ -401,14 +401,8 @@ void tirado4i(int exponent, int debugLevel) {
 
   // if pivot is even... convert to odd
   if (mpz_tstbit(pivot.get_mpz_t(), 0) == 0) {
-    pivot--;
+    pivot++;
   }
-
-  /*
-    while (mpz_tstbit(pivot.get_mpz_t(), 0) == 0) {
-      pivot /= 2;
-    }
-    */
 
   // Imprimimos:
   gmp_printf("2^%d - 1 = %Zd\r\n", exponent, mersenne.get_mpz_t());
@@ -419,8 +413,8 @@ void tirado4i(int exponent, int debugLevel) {
       argument = (pivot - 1) / 2;
       mpz_mod_ui(mod.get_mpz_t(), argument.get_mpz_t(), exponent);
       if (mod == 0) {
-        gmp_printf("\r\npivot=%Zd\r\n", pivot.get_mpz_t());
-        gmp_printf("argument(2m+1): %Zd\r\n", argument.get_mpz_t());
+        gmp_printf("\r\npivot=2m+1=%Zd\r\n", pivot.get_mpz_t());
+        gmp_printf("m=%Zd\r\n", argument.get_mpz_t());
         div = argument / exponent;
         gmp_printf("DIVISIBLE BY %d => %Zd/%d = %Zd\r\n", exponent,
                    argument.get_mpz_t(), exponent, div.get_mpz_t());
@@ -574,6 +568,86 @@ void tirado4l(int exponent, int debugLevel) {
   cout << endl;
 }
 
+void tirado4m(int exponent, int debugLevel) {
+
+  kdProcessSpin spin;
+  kdTimer timer;
+
+  mpz_class mersenne, root, k, factor, mod;
+
+  timer.start();
+
+  // Get Mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, exponent);
+  mersenne--;
+
+  // get root
+  mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+  k = 1;
+  while (true) {
+    factor = (k * exponent) + 1;
+    mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), factor.get_mpz_t());
+    if (mod == 0) {
+      gmp_printf("isn't prime. Has %Zd factor\n", factor.get_mpz_t());
+      break;
+    }
+    if (factor > root) {
+      printf("is prime\n");
+      break;
+    }
+    k++;
+  }
+
+  printf("Time elapsed: %f\n", timer.stop());
+}
+
+void tirado4n(int exponent, int debugLevel) {
+
+  kdProcessSpin spin;
+  kdTimer timer;
+
+  mpz_class mersenne, root, k, fTmp, factor, mod;
+  int twoFactor[]{2, 4, 8, 16, 32, 64, 128};
+  int twoFactorIndex;
+  bool process = true;
+
+  timer.start();
+  spin.cyclesForStep = 1000;
+  spin.reset();
+  
+
+  // Get Mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, exponent);
+  mersenne--;
+
+  // get root
+  mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+  k = 1;
+  fTmp = 1;
+
+  while (process) {
+    for (twoFactorIndex = 0; twoFactorIndex < 7; twoFactorIndex++) {
+      factor = (twoFactor[twoFactorIndex] * k * exponent) + 1;
+      if (factor > root) {
+        printf("is prime\n");
+        process = false;
+        break;
+      }
+      mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), factor.get_mpz_t());
+
+      if (mod == 0) {
+        gmp_printf("isn't prime. Has %Zd factor\n", factor.get_mpz_t());
+        process = false;
+        break;
+      }
+    }
+    k += 2;
+    spin.show();
+  }
+
+  printf("Time elapsed: %f\n", timer.stop());
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent;
@@ -623,6 +697,25 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(12, (char *)"l", (char *)"L",
                       (char *)"Tirado evaluation 5", (char *)"N"));
+
+  /**
+   * Buscar factores así: k * p + 1.. Si esto divide al mersenne entonces es
+   * compuesto si se llega a la raiz cuadrada del mersenne no lo divide
+   * */
+
+  argHdl.add(argument(13, (char *)"m", (char *)"M",
+                      (char *)"Experimento de Aldo, búsqueda por módulo",
+                      (char *)"N"));
+
+  /**
+   * Buscar factores así: k * p + 1.. Si esto divide al mersenne entonces es
+   * compuesto si se llega a la raiz cuadrada del mersenne no lo divide
+   * SEGUNDA IMPLEMENTACION
+   * */
+
+  argHdl.add(argument(14, (char *)"n", (char *)"N",
+                      (char *)"Experimento de Aldo, búsqueda por módulo",
+                      (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -693,7 +786,6 @@ int main(int argc, char *argv[]) {
       argHdl.pvalue(&exponent);
       tirado4i(exponent, debugLevel);
       break;
-
       // experimento de Tirado, con la variación de buscar argumentos primos
     case 10:
       argHdl.pvalue(&exponent);
@@ -707,8 +799,44 @@ int main(int argc, char *argv[]) {
       argHdl.pvalue(&exponent);
       tirado4l(exponent, debugLevel);
       break;
+
+    case 13:
+      argHdl.pvalue(&exponent);
+      tirado4m(exponent, debugLevel);
+      break;
+
+    case 14:
+      argHdl.pvalue(&exponent);
+      tirado4n(exponent, debugLevel);
+      break;
     }
   }
+
+  /** DEterminar que el número 2^(2^127-1)-1 termina el 7.
+    // calculamos el mersenne
+    mpz_class mersenne, mod;
+    mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, 127);
+    mersenne--;
+    mpz_mod_ui(mod.get_mpz_t(), mersenne.get_mpz_t(), 4);
+    gmp_printf("A=%Zd mod=%Zd", mersenne.get_mpz_t(), mod.get_mpz_t());
+    */
+
+  /*
+   mpz_class mersenne, mod;
+  for (int i=2; i<128; i++) {
+
+      mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, 127);
+      mersenne--;
+
+
+  }
+  */
+
+  /*
+  mpz_class mersenne, a, mod;
+    mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, 127);
+    mersenne--;
+  */
 }
 
 // 2, 3, 5, 7, 11, 13, 17, 19, 23, 29. 31, 37, 41, 43, 47, 53, 59, 61, 67,

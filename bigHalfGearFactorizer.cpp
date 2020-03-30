@@ -1,4 +1,14 @@
 #include "bigHalfGearFactorizer.h"
+
+/* Número factorizado:
+2^127-1-1
+2*3^3*7^2*19*43*73*127*337*5419*92737*649657*77158673929
+
+bigHalfGearFactorizer.out -n:170141183460469231731687303715884105726
+2*3^3*7^2*19*43*73*127*337*5419*92737*649657*77158673929 (8968.79)
+*/
+
+
 /*
 Factorizador de números grandes con detección de primariedad determinista
 No usa base de datos previos
