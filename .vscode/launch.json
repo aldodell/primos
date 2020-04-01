@@ -161,7 +161,7 @@
             "program": "${workspaceRoot}/tirado4.out",
             "args": [
                 "-d:10",
-                "-i:7"
+                "-p:0"
             ]
         },
         {

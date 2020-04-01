@@ -1,0 +1,12 @@
+ define t(p) {
+local M,root;
+ M = 2^p-1;
+ root = sqrt(M);
+ local cycles;
+  cycles = (root - 1) / (2 * p);
+ local ts;
+ ts = cycles * 6 / 10000000;
+ ts = ts / 3600;
+ ts = ts / 24;
+ return ts;
+ }

@@ -6,9 +6,9 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 #define CALL_MEMBER_FN(object, ptrToMember) ((object).*(ptrToMember))
 
@@ -51,9 +51,20 @@ private:
   int index = 0;
 };
 
-std::string string_join(const std::vector<std::string>& elements, const char* const separator);
+class kdProcessBenchmark {
+public:
+  unsigned int cyclesForStep = 1000000;
+  void tick();
+  void start();
+  void stop();
 
+private:
+  size_t tIni, tSnap, tEnd;
+   unsigned int cycles = 0;
+};
 
+std::string string_join(const std::vector<std::string> &elements,
+                        const char *const separator);
 
 #define KDUTILS_H
 #endif

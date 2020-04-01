@@ -31,5 +31,6 @@ void tirado4k(int exponent, int debugLevel = 0);
 void tirado4l(int exponent, int debugLevel = 0);
 void tirado4m(int exponent, int debugLevel = 0);
 void tirado4n(int exponent, int debugLevel = 0);
+void tirado4o(int exponent, int debugLevel = 0);
 
 #endif

@@ -605,47 +605,146 @@ void tirado4n(int exponent, int debugLevel) {
 
   kdProcessSpin spin;
   kdTimer timer;
+  kdProcessBenchmark benchmark;
 
-  mpz_class mersenne, root, k, fTmp, factor, mod;
-  int twoFactor[]{2, 4, 8, 16, 32, 64, 128};
-  int twoFactorIndex;
+  mpz_class mersenne, root, rootMinusOne, k, k2, factor, border, mod, cycles,
+      twoBase, exp;
+
+  twoBase = 2;
+  exp = exponent;
+
+  // This factor is 2^n * exponent in order to improve calc velocity
+  // int twoFactor[]{2 * exponent,  4 * exponent,  8 * exponent,  16 * exponent,
+  //              32 * exponent, 64 * exponent, 128 * exponent};
+  // int twoFactorIndex;
   bool process = true;
 
   timer.start();
-  spin.cyclesForStep = 1000;
+  spin.cyclesForStep = 100000000;
   spin.reset();
-  
+  benchmark.cyclesForStep = 20000000;
 
   // Get Mersenne
   mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, exponent);
   mersenne--;
+  gmp_printf("Processing 2^%d-1\n", exponent);
+
+  int isExpPrime = mpz_probab_prime_p(exp.get_mpz_t(), 50);
+  if (isExpPrime < 2) {
+    gmp_printf("Warning! 2^%d-1 This program requires \n an prime exponent to "
+               "generate prime "
+               "numbers. \n Ambigous results will return.\n",
+               exponent);
+  }
+
+  /** Probabilistic test. Spend much time
+  int prob = mpz_probab_prime_p(mersenne.get_mpz_t(), 15);
+  switch (prob) {
+  case 0:
+    gmp_printf("Processing 2^%d-1 isn't prime by prob test\n", exponent);
+    break;
+  case 1:
+    gmp_printf("Processing 2^%d-1 could be prime by prob test\n", exponent);
+    break;
+  case 2:
+    gmp_printf("Processing 2^%d-1 is prime by prob test\n", exponent);
+    break;
+
+  default:
+    break;
+  }
+  */
 
   // get root
   mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+  // rootMinusOne = root - 1;
   k = 1;
-  fTmp = 1;
+  // border = root / (2 * exponent);
+  k2 = 2 * exponent;
 
+  benchmark.start();
   while (process) {
-    for (twoFactorIndex = 0; twoFactorIndex < 7; twoFactorIndex++) {
-      factor = (twoFactor[twoFactorIndex] * k * exponent) + 1;
-      if (factor > root) {
-        printf("is prime\n");
-        process = false;
-        break;
-      }
-      mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), factor.get_mpz_t());
-
-      if (mod == 0) {
-        gmp_printf("isn't prime. Has %Zd factor\n", factor.get_mpz_t());
-        process = false;
-        break;
-      }
+    factor = k * k2 + 1;
+    if (root < factor) {
+      gmp_printf("is prime. k = %Zd\n", k.get_mpz_t());
+      process = false;
+      break;
     }
-    k += 2;
-    spin.show();
+    // for (twoFactorIndex = 0; twoFactorIndex < 4; twoFactorIndex++) {
+    // factor = (twoFactor[twoFactorIndex] * k) + 1;
+    // mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), factor.get_mpz_t());
+    mpz_powm(mod.get_mpz_t(), twoBase.get_mpz_t(), exp.get_mpz_t(),
+             factor.get_mpz_t());
+    if (mod == 1) {
+      gmp_printf("isn't prime. Has %Zd factor\n", factor.get_mpz_t());
+      process = false;
+      break;
+    }
+    //}
+    k += 1;
+    // spin.show();
+    benchmark.tick();
   }
 
-  printf("Time elapsed: %f\n", timer.stop());
+  gmp_printf("Time elapsed: %f, k=%Zd\n", timer.stop(), k.get_mpz_t());
+}
+
+void tirado4o(int exponent, int debugLevel) {
+
+  mpz_class prime;
+  prime = 2;
+  for (int i = 0; i < 30; i++) {
+    mpz_nextprime(prime.get_mpz_t(), prime.get_mpz_t());
+    tirado4n(prime.get_ui(), 0);
+  }
+}
+
+void tirado4p(int exponent, int debugLevel) {
+  /**
+   * 7=2 (3)+1
+3=2 (1)+1
+      .
+      .
+13=2 (6)+1
+6=2×3 y 3=2 (1)+1
+       .
+       .
+19=2 (9)+1
+9=3^2
+*/
+
+  unsigned int mersenneExponents[]{
+      2,        3,        5,        7,        13,       17,       19,
+      31,       61,       89,       107,      127,      521,      607,
+      1279,     2203,     2281,     3217,     4253,     4423,     9689,
+      9941,     11213,    19937,    21701,    23209,    44497,    86243,
+      110503,   132049,   216091,   756839,   859433,   1257787,  1398269,
+      2976221,  3021377,  6972593,  13466917, 20996011, 24036583, 25964951,
+      30402457, 32582657, 37156667, 42643801, 43112609};
+
+  unsigned int p = exponent;
+  unsigned a, b, mod;
+
+  for (int i = 1; i < 47; i++) {
+    p = mersenneExponents[i];
+    printf("p=%d\n", p);
+    a = 2;
+    while (true) {
+      if (p == 2)
+        break;
+      mod = (p - 1) % a;
+      if (mod == 0) {
+        b = (p - 1) / a;
+        printf("\t%d=%d*%d + 1\n", p, a, b);
+        p = b;
+        a = 1;
+      }
+      if (b == 1)
+        break;
+      a++;
+    }
+    printf("\n");
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -715,6 +814,24 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(14, (char *)"n", (char *)"N",
                       (char *)"Experimento de Aldo, búsqueda por módulo",
+                      (char *)"N"));
+
+  /**
+   * Implementa un bucle de búsqueda con exponentes primos
+   * en números de mersenne que generan números compuestos
+   * a efecto de estudiar las k...
+   * */
+
+  argHdl.add(argument(15, (char *)"o", (char *)"O",
+                      (char *)"Experimento de Aldo, búsqueda por módulo",
+                      (char *)"N"));
+
+  /**
+   * Descomposición de exponentes en la forma 2m+1
+   * */
+
+  argHdl.add(argument(16, (char *)"p", (char *)"O",
+                      (char *)"Descomposición de exponentes en la forma 2m+1",
                       (char *)"N"));
 
   while (action > -1) {
@@ -808,6 +925,16 @@ int main(int argc, char *argv[]) {
     case 14:
       argHdl.pvalue(&exponent);
       tirado4n(exponent, debugLevel);
+      break;
+
+    case 15:
+      argHdl.pvalue(&exponent);
+      tirado4o(exponent, debugLevel);
+      break;
+
+    case 16:
+      argHdl.pvalue(&exponent);
+      tirado4p(exponent, debugLevel);
       break;
     }
   }

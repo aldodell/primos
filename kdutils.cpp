@@ -117,6 +117,29 @@ void kdProcessSpin::show() {
   }
 }
 
+void kdProcessBenchmark::start() {
+  this->tIni = clock();
+  this->tSnap = tIni;
+}
+
+void kdProcessBenchmark::tick() {
+  this->cycles++;
+  if (this->cycles == this->cyclesForStep) {
+    size_t tmp = clock();
+    double t = (double)(tmp - this->tSnap) / CLOCKS_PER_SEC;
+    printf("Cycles: %d in %f seconds. %d cycles/sec\n", this->cycles, t,
+           int(this->cycles / t));
+    this->tSnap = tmp;
+    this->cycles = 0;
+  }
+}
+
+void kdProcessBenchmark::stop() {
+  size_t tmp = clock();
+  double t = (double)(tmp - this->tIni) / CLOCKS_PER_SEC;
+  printf("Total process time: %f seconds.\n", t);
+}
+
 std::string string_join(const std::vector<std::string> &elements,
                         const char *const separator) {
   switch (elements.size()) {
