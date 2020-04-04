@@ -11,6 +11,8 @@
 #include "primeTester.h"
 #include <gmpxx.h>
 
+
+
 struct factor {
   mpz_class base;
   mpz_class exp;
@@ -32,5 +34,7 @@ void tirado4l(int exponent, int debugLevel = 0);
 void tirado4m(int exponent, int debugLevel = 0);
 void tirado4n(int exponent, int debugLevel = 0);
 void tirado4o(int exponent, int debugLevel = 0);
+void tirado4q(int exponent, int debugLevel = 0);
+void tirado4t(int exponent, int debugLevel = 0);
 
 #endif
