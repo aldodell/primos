@@ -858,7 +858,8 @@ void tirado4u(int exponent, int debugLevel) {
   bool isPrimeMersenne;
 
   i = 0;
-  p = 2 gp = 2;
+  p = 2;
+  gp = 2;
   printf("*_p_=%d*\n", p);
 
   while (true) {
@@ -879,10 +880,13 @@ void tirado4u(int exponent, int debugLevel) {
         gf.find(p);
         printf("\t%d=%s\n", p, gf.toString().c_str());
         gf.clear();
+        printf("\tfootprint=%d\n", p / 2);
+      } else {
+        printf("\tfootprint=%d\n", p / 2);
       }
 
       i++;
-      if (i == 200)
+      if (i == 1000)
         break;
 
       mpz_nextprime(gp.get_mpz_t(), gp.get_mpz_t());
@@ -891,10 +895,89 @@ void tirado4u(int exponent, int debugLevel) {
           std::find(std::begin(mersenneExponents), std::end(mersenneExponents),
                     p) != std::end(mersenneExponents);
 
+      printf("\n*_p_=%d* ", p);
       if (isPrimeMersenne) {
-        printf("\n\n*Is mersenne prime*\n");
+        printf("*Is mersenne prime*\n");
+      } else {
+        printf("\n");
       }
-      printf("\n\n*_p_=%d*\n", p);
+    }
+  }
+}
+
+/**
+ * Atomización de exponentes primos de mersenne, comparando su comportamiento
+ * al cambiar 4k+1 por 4k-3 y 4k+3 por k4-1
+ * */
+void tirado4v(int exponent, int debugLevel) {
+  unsigned int mersenneExponents[]{
+      2,        3,        5,        7,        13,       17,       19,
+      31,       61,       89,       107,      127,      521,      607,
+      1279,     2203,     2281,     3217,     4253,     4423,     9689,
+      9941,     11213,    19937,    21701,    23209,    44497,    86243,
+      110503,   132049,   216091,   756839,   859433,   1257787,  1398269,
+      2976221,  3021377,  6972593,  13466917, 20996011, 24036583, 25964951,
+      30402457, 32582657, 37156667, 42643801, 43112609, 57885161, 74207281,
+      77232917, 82589933};
+
+  int i;
+  int mod4k1;  // 4k+1
+  int mod4k3;  // 4k+3
+  int mod4km1; // 4k-1
+  int mod4km3; // 4k+1
+  int p;
+  int ka;
+  int kb;
+
+  for (i = 0; i < 51; i++) {
+    p = mersenneExponents[i];
+
+    printf("*p=%d*\n", p);
+
+    while (true) {
+      mod4k1 = (p - 1) % 4;
+      mod4k3 = (p - 3) % 4;
+
+      if (mod4k1 == 0) {
+        ka = (p - 1) / 4;
+        kb = (p + 3) / 4;
+        printf("%d = 4(%d)+1 = 4(%d)-3\n", p, ka, kb);
+        p = (p - 1) / 4;
+      } else if (mod4k3 == 0) {
+        ka = (p - 3) / 4;
+        kb = (p + 1) / 4;
+        printf("%d = 4(%d)+3 = 4(%d)-1\n", p, ka, kb);
+        p = (p - 3) / 4;
+      } else {
+        printf("\n");
+        break;
+      }
+    }
+
+    p = mersenneExponents[i];
+
+    while (true) {
+      mod4km1 = (p + 1) % 4;
+      mod4km3 = (p + 3) % 4;
+      if (mod4km1 == 0) {
+        ka = (p + 1) / 4;
+        kb = (p - 3) / 4;
+        printf("%d = 4(%d)-1 = 4(%d)+3\n", p, ka, kb);
+        p = (p + 1) / 4;
+      } else if (mod4km3 == 0) {
+        ka = (p + 3) / 4;
+        kb = (p - 1) / 4;
+        printf("%d = 4(%d)-3 = 4(%d)+1\n", p, ka, kb);
+        p = (p + 3) / 4;
+        if (p == 1) {
+          printf("\n");
+          break;
+        }
+
+      } else {
+        printf("\n");
+        break;
+      }
     }
   }
 }
@@ -997,7 +1080,11 @@ int main(int argc, char *argv[]) {
 
   /* atomización*/
   argHdl.add(
-      argument(19, (char *)"u", (char *)"U", (char *)"Velocidad", (char *)"N"));
+      argument(20, (char *)"u", (char *)"U", (char *)"Velocidad", (char *)"N"));
+
+  /* atomización doble modo */
+  argHdl.add(
+      argument(21, (char *)"v", (char *)"U", (char *)"Velocidad", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -1120,6 +1207,11 @@ int main(int argc, char *argv[]) {
     case 20:
       argHdl.pvalue(&speed);
       tirado4u(exponent, debugLevel);
+      break;
+
+    case 21:
+      argHdl.pvalue(&speed);
+      tirado4v(exponent, debugLevel);
       break;
     }
   }

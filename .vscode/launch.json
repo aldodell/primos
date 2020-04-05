@@ -160,7 +160,7 @@
             "terminal": "console",
             "program": "${workspaceRoot}/tirado4.out",
             "args": [
-                "-u:10",
+                "-v:10",
                 "-p:0"
             ]
         },

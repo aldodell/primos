@@ -2,16 +2,14 @@
 #define TIRADO4_H
 
 #include "argumentsHandler.h"
-#include "kdutils.h"
-#include "maths_prime.h"
-#include "string"
 #include "bigFactorObject.h"
 #include "bigGearsFactorizer.h"
 #include "bigHalfGearFactorizer.h"
+#include "kdutils.h"
+#include "maths_prime.h"
 #include "primeTester.h"
+#include "string"
 #include <gmpxx.h>
-
-
 
 struct factor {
   mpz_class base;
@@ -36,5 +34,6 @@ void tirado4n(int exponent, int debugLevel = 0);
 void tirado4o(int exponent, int debugLevel = 0);
 void tirado4q(int exponent, int debugLevel = 0);
 void tirado4t(int exponent, int debugLevel = 0);
+void tirado4v(int exponent, int debugLevel = 0);
 
 #endif
