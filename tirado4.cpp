@@ -982,6 +982,77 @@ void tirado4v(int exponent, int debugLevel) {
   }
 }
 
+/** Toma los números de Mersenne (excluyendo lo que se saben generan primos)
+ * para evaluar sus factores en la forma: 2pk+1
+ * */
+
+void tirado4w(int exponent, int debugLevel) {
+  unsigned int mersenneExponents[]{
+      2,        3,        5,        7,        13,       17,       19,
+      31,       61,       89,       107,      127,      521,      607,
+      1279,     2203,     2281,     3217,     4253,     4423,     9689,
+      9941,     11213,    19937,    21701,    23209,    44497,    86243,
+      110503,   132049,   216091,   756839,   859433,   1257787,  1398269,
+      2976221,  3021377,  6972593,  13466917, 20996011, 24036583, 25964951,
+      30402457, 32582657, 37156667, 42643801, 43112609, 57885161, 74207281,
+      77232917, 82589933};
+
+  mpz_class p, p2, k, f, r, m, mod, TWO, fx;
+  int i;
+  p = 2;
+  TWO = 2;
+  bool isPrimeMersenne;
+
+  for (i = 0; i < 100; i++) {
+    mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
+
+    isPrimeMersenne =
+        std::find(std::begin(mersenneExponents), std::end(mersenneExponents),
+                  p.get_ui()) != std::end(mersenneExponents);
+
+    if (!isPrimeMersenne) {
+      mpz_ui_pow_ui(m.get_mpz_t(), 2, p.get_ui());
+      m--;
+      gmp_printf("*2^%Zd-1*\n", p.get_mpz_t());
+      mpz_sqrt(r.get_mpz_t(), m.get_mpz_t());
+
+      p2 = 2 * p;
+      k = 1;
+      while (true) {
+        while (true) {
+          f = p2 * k + 1;
+          mpz_mod(mod.get_mpz_t(), m.get_mpz_t(), f.get_mpz_t());
+          if (mod.get_ui() == 0) {
+            m = m / f;
+
+            k++;
+            break;
+          }
+          k++;
+        }
+        gmp_printf("\t%Zd = 2 x %Zd x %Zd + 1\n", f.get_mpz_t(), p.get_mpz_t(),
+                   k.get_mpz_t());
+        if (m.get_ui() == 1) {
+          break;
+        }
+      }
+      printf("\n");
+    }
+  }
+}
+
+void tirado4x(int exponent, int debugLevel) {
+  mpz_class m, mt, q, r;
+  int n;
+
+  mpz_ui_pow_ui(m.get_mpz_t(), 2, exponent);
+  mpz_sub_ui(mt.get_mpz_t(), m.get_mpz_t(), 2);
+  n= mpz_divisible_ui_p(mt.get_mpz_t(), exponent);
+
+
+  gmp_printf("n=%d, r=%Zd\n", n, r.get_mpz_t());
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent, speed;
@@ -1085,6 +1156,14 @@ int main(int argc, char *argv[]) {
   /* atomización doble modo */
   argHdl.add(
       argument(21, (char *)"v", (char *)"U", (char *)"Velocidad", (char *)"N"));
+
+  /* Tomar todos los M no primos, y descomponer sus factores en la form 2pk+1 */
+  argHdl.add(
+      argument(22, (char *)"w", (char *)"W", (char *)"Velocidad", (char *)"N"));
+
+  /*** PRueba trivialll */
+  argHdl.add(
+      argument(23, (char *)"x", (char *)"W", (char *)"Exponente", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -1212,6 +1291,16 @@ int main(int argc, char *argv[]) {
     case 21:
       argHdl.pvalue(&speed);
       tirado4v(exponent, debugLevel);
+      break;
+
+    case 22:
+      argHdl.pvalue(&speed);
+      tirado4w(exponent, debugLevel);
+      break;
+
+    case 23:
+      argHdl.pvalue(&exponent);
+      tirado4x(exponent, debugLevel);
       break;
     }
   }
