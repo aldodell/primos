@@ -1047,10 +1047,317 @@ void tirado4x(int exponent, int debugLevel) {
 
   mpz_ui_pow_ui(m.get_mpz_t(), 2, exponent);
   mpz_sub_ui(mt.get_mpz_t(), m.get_mpz_t(), 2);
-  n= mpz_divisible_ui_p(mt.get_mpz_t(), exponent);
-
+  n = mpz_divisible_ui_p(mt.get_mpz_t(), exponent);
 
   gmp_printf("n=%d, r=%Zd\n", n, r.get_mpz_t());
+}
+
+void atomizer(mpz_class init) {
+  mpz_class j, k;
+  k = init;
+
+  gmp_printf("\tFirst form:\n");
+  while (true) {
+
+    // ¿Es de la forma 4k+1?
+    if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+1?
+        if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k-1?
+        if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  gmp_printf("\n\tSecond form:\n");
+  k = init;
+  while (true) {
+
+    // ¿Es de la forma 4k-1?
+    if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+      // ¿Es de la forma 4k-1?
+    } else if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 3) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 3) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+}
+
+/**Análisis de cada número de Mersenne*/
+void tirado4y(mpz_class exponent, int debugLevel) {
+
+  mpz_class mersenne, m0, j, k, xp, xm;
+  int n, digits, lastDigit;
+  bigHalfGearFactorizer gf;
+  char *lastTenDigits;
+
+  // Obtenemos Mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, exponent.get_ui());
+  mersenne--;
+
+  gmp_printf("Analyzing: 2^%Zd-1\n", exponent.get_mpz_t());
+
+  m0 = mersenne;
+
+  /**
+   * Data about Mersenne M
+   * */
+  digits = ((log(2) / log(10)) * exponent.get_ui()) + 1;
+  lastDigit = (exponent / 2) % 2 == 0 ? 1 : 7;
+  printf("%s\nMersenne analysis: facts\n", string(40, '=').c_str());
+  printf("\tDigits: %d\n\tLast digit: ...%d\n\n", digits, lastDigit);
+
+  /**
+   * Data about exponent p on 2^p-1
+   * */
+
+  // Calculamos los exponentes
+  k = exponent;
+
+  printf("%s\nExponent analysis: Is 4k+1, 4k+3, 4k-1, 4k-3 form?\n",
+         string(40, '=').c_str());
+
+  atomizer(exponent);
+
+  gmp_printf("\tFirst form:\n");
+  while (true) {
+
+    // ¿Es de la forma 4k+1?
+    if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+1?
+        if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k-1?
+        if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  gmp_printf("\n\tSecond form:\n");
+  k = exponent;
+  while (true) {
+
+    // ¿Es de la forma 4k-1?
+    if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+      // ¿Es de la forma 4k-1?
+    } else if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 3) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 3) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  /**
+   * Calcular Xp: p = 2Xp+1
+   * */
+
+  xp = (exponent - 1) / 2;
+  k = xp;
+  gmp_printf("\n\tAnalysis of Xp: p = 2*Xp + 1 => Xp=%Zd\n", xp.get_mpz_t());
+  gmp_printf("\tFirst form:\n");
+  while (true) {
+
+    // ¿Es de la forma 4k+1?
+    if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+1?
+        if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k-1?
+        if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  gmp_printf("\n\tSecond form:\n");
+  k = xp;
+  while (true) {
+
+    // ¿Es de la forma 4k-1?
+    if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+      // ¿Es de la forma 4k-1?
+    } else if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 3) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 3) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  gf.clear();
+  gf.find(xp.get_ui());
+  gmp_printf("\n\tFactors of Xp{%Zd} = %s\n", xp.get_mpz_t(),
+             gf.toString().c_str());
+
+  /** Deep analysis of Mersenne */
+  printf("\n%s\nDeep Mersenne analysis\n", string(40, '=').c_str());
+
+  if (m0.get_str().length() > 10) {
+    lastTenDigits = (char *)mersenne.get_str().substr(digits - 10).c_str();
+  } else {
+    lastTenDigits = (char *)mersenne.get_str().c_str();
+  }
+
+  printf("\tLast ten digits:%s\n", (char *)lastTenDigits);
+
+  /** Calculate Xm: 2^p-1 = 2pXm+1
+   * */
+  xm = (m0 - 1) / (2 * exponent);
+  if (xm.get_str().length() > 10) {
+    lastTenDigits = (char *)xm.get_str().substr(digits - 12).c_str();
+  } else {
+    lastTenDigits = (char *)xm.get_str().c_str();
+  }
+  gmp_printf("\n\tAnalysis of Xm: M = 2*p*Xm + 1 => Xm=%s [last ten digits]\n",
+             lastTenDigits);
+
+  k = xm;
+  gmp_printf("\tFirst form:\n");
+  while (true) {
+
+    // ¿Es de la forma 4k+1?
+    if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+1?
+        if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k-1?
+        if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  gmp_printf("\n\tSecond form:\n");
+  k = xm;
+  while (true) {
+
+    // ¿Es de la forma 4k-1?
+    if ((k + 1) % 4 == 0) {
+      j = k;
+      k = (k + 1) / 4;
+      gmp_printf("\t%Zd => 4k-1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+      // ¿Es de la forma 4k-1?
+    } else if ((k + 3) % 4 == 0) {
+      j = k;
+      k = (k + 3) / 4;
+      gmp_printf("\t%Zd => 4k-3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else if ((k - 1) % 4 == 0) {
+      j = k;
+      k = (k - 1) / 4;
+      gmp_printf("\t%Zd => 4k+1 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else // ¿Es de la forma 4k+3?
+        if ((k - 3) % 4 == 0) {
+      j = k;
+      k = (k - 3) / 4;
+      gmp_printf("\t%Zd => 4k+3 => k=%Zd\n", j.get_mpz_t(), k.get_mpz_t());
+    } else {
+      break;
+    }
+  }
+
+  /*
+    gf.clear();
+    gf.find(xp.get_ui());
+    gmp_printf("\n\tFactors of Xp{%Zd} = %s\n", xp.get_mpz_t(),
+               gf.toString().c_str());
+               */
 }
 
 int main(int argc, char *argv[]) {
@@ -1164,6 +1471,10 @@ int main(int argc, char *argv[]) {
   /*** PRueba trivialll */
   argHdl.add(
       argument(23, (char *)"x", (char *)"W", (char *)"Exponente", (char *)"N"));
+
+  /*** PRueba trivialll */
+  argHdl.add(
+      argument(24, (char *)"y", (char *)"W", (char *)"Exponente", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -1301,6 +1612,11 @@ int main(int argc, char *argv[]) {
     case 23:
       argHdl.pvalue(&exponent);
       tirado4x(exponent, debugLevel);
+      break;
+
+    case 24:
+      argHdl.pvalue(&exponent);
+      tirado4y(exponent, debugLevel);
       break;
     }
   }
