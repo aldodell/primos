@@ -1258,20 +1258,15 @@ void tirado4z(mpz_class exponent, int debugLevel) {
   bigHalfGearFactorizer bf;
   string XpFactors, XmFactors;
 
-  printf("<style>"
-         "table {"
-         " border-collapse: collapse;"
-         "}"
-         "table, th, td {"
-         " border: 1px solid black;"
-         "}"
-         "</style>");
+  printf("\\documentclass{article}\r\n"
+         "%% Definimos el título \r\n"
+         "\\title{Título del documento} \r\n"
+         "\\begin{document} \r\n"
+         "\\maketitle %% Creamos el título \r\n"
+         "\\begin{tabular}{c | c | c | c} \r\n");
 
   /** Send html table codes */
-  printf(
-      "<table >"
-      "<tr >"
-      "<td>M</td><td>Type</td><td>Xp=(p-1)/2</td><td>Xm=(M-1)/(2p)</td></tr>");
+  printf("M & 4pk+? & Xp=(p-1)/2 & Xm=(M-1)/(2p) \\\\ \\hline \r\n");
 
   for (i = 0; i < 33; i++) { // Recorren los números primos
     // Take next prime: exponent
@@ -1289,14 +1284,12 @@ void tirado4z(mpz_class exponent, int debugLevel) {
     bf.find(Xm);
     XmFactors = bf.toString();
 
-    gmp_printf("<tr><td>2<sup>%Zd</sup>-1</td><td>%s</td><td>%Zd = "
-               "{%s}</td><td>{%s}</"
-               "td></tr><tr><td><hr/></td></tr>",
+    gmp_printf("$2^{%Zd}-1$ & %s & %Zd={$%s$} & $%s$ \\\\ \\hline \r\n",
                p.get_mpz_t(), type4k(p).c_str(), Xp.get_mpz_t(),
                XpFactors.c_str(), XmFactors.c_str());
   }
 
-  printf("</table>");
+  printf("\\end{tabular}\r\n\\end{document}\r\n");
 }
 
 int main(int argc, char *argv[]) {
