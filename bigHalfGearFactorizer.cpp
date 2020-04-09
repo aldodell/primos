@@ -8,7 +8,6 @@ bigHalfGearFactorizer.out -n:170141183460469231731687303715884105726
 2*3^3*7^2*19*43*73*127*337*5419*92737*649657*77158673929 (8968.79)
 */
 
-
 /*
 Factorizador de números grandes con detección de primariedad determinista
 No usa base de datos previos
@@ -16,6 +15,10 @@ No usa base de datos previos
 
 void bigHalfGearFactorizer::find(mpz_class n) {
   mpz_class pivot, mod, root;
+
+  if (n < 2) {
+    return;
+  }
 
   // Filter "2" factors (for discard parity)
   while (true) {
@@ -33,20 +36,24 @@ void bigHalfGearFactorizer::find(mpz_class n) {
 
   // Next pivot value
   pivot = 3;
+
   // square root of number to be factorized
   mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
 
   while (true) {
 
     while (true) {
-      mpz_mod(mod.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
-      if (mod > 0) {
+      // mpz_mod(mod.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
+      // if (mod > 0) {
+      if (mpz_divisible_p(n.get_mpz_t(), pivot.get_mpz_t()) == 0) {
         break;
-        mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
+        // ESTABA AQUI:  mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
       }
-      n /= pivot;
-      this->factors.push_back(pivot);
+      mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
+      mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
 
+      // n /= pivot;
+      this->factors.push_back(pivot);
       if (n == 1) {
         break;
       }
@@ -73,6 +80,10 @@ string bigHalfGearFactorizer::toString() {
   bigFactorObject obj;
   string s;
   int i, j;
+
+  if (this->factors.size() == 0) {
+    return "";
+  }
 
   for (i = 0; i < this->factors.size(); i++) {
     flag = false;

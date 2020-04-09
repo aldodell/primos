@@ -19,6 +19,8 @@ struct factor {
 // Compares two intervals according to staring times.
 bool compareFactors(factor i1, factor i2) { return (i1.base < i2.base); }
 
+void atomizer(mpz_class init);
+
 void tirado4a(int exponent, int debugLevel = 0);
 void tirado4b(int exponent, int debugLevel = 0);
 void tirado4c(int exponent, int debugLevel = 0);
@@ -37,4 +39,5 @@ void tirado4t(int exponent, int debugLevel = 0);
 void tirado4v(int exponent, int debugLevel = 0);
 void tirado4w(int exponent, int debugLevel = 0);
 void tirado4y(mpz_class exponent, int debugLevel = 0);
+void tirado4z(mpz_class exponent, int debugLevel = 0);
 #endif
