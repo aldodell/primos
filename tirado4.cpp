@@ -1250,6 +1250,16 @@ string type4k(mpz_class n) {
 /**Análisis de cada número de Mersenne*/
 void tirado4z(mpz_class exponent, int debugLevel) {
 
+  vector<unsigned int> mersenneExponents{
+      2,        3,        5,        7,        13,       17,       19,
+      31,       61,       89,       107,      127,      521,      607,
+      1279,     2203,     2281,     3217,     4253,     4423,     9689,
+      9941,     11213,    19937,    21701,    23209,    44497,    86243,
+      110503,   132049,   216091,   756839,   859433,   1257787,  1398269,
+      2976221,  3021377,  6972593,  13466917, 20996011, 24036583, 25964951,
+      30402457, 32582657, 37156667, 42643801, 43112609, 57885161, 74207281,
+      77232917, 82589933};
+
   int i;
 
   mpz_class p = 1;
@@ -1259,19 +1269,22 @@ void tirado4z(mpz_class exponent, int debugLevel) {
   string XpFactors, XmFactors;
 
   printf("\\documentclass{article}\r\n"
-         "%% Definimos el título \r\n"
-         "\\title{Título del documento} \r\n"
+         "\\title{Análisis de números primos} \r\n"
          "\\begin{document} \r\n"
-         "\\maketitle %% Creamos el título \r\n"
-         "\\begin{tabular}{c | c | c | c} \r\n");
+         "\\maketitle\r\n");
+
+  /******************  NUMEROS PRIMOS DE MERSENNE  *****************/
+
+  printf("\\begin{tabular}{c | c | c | c} \r\n");
 
   /** Send html table codes */
   printf("M & 4pk+? & Xp=(p-1)/2 & Xm=(M-1)/(6p) \\\\ \\hline \r\n");
 
-  for (i = 0; i < exponent.get_ui(); i++) { // Recorren los números primos
-    // Take next prime: exponent
-    mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
+  for (i = 0; i < 12; i++) { // Recorren los números primos
+                             // Take next prime: exponent
+    p = mersenneExponents[i];
     mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
+
     mersenne--;
     Xp = (p - 1) / 2;
     Xm = (mersenne - 1) / (6 * p);
@@ -1289,6 +1302,40 @@ void tirado4z(mpz_class exponent, int debugLevel) {
                XpFactors.c_str(), XmFactors.c_str());
   }
 
+  printf("\\end{tabular}\r\n");
+
+  /******************  NUMEROS NO PRIMOS DE MERSENNE  ****************/
+  p = 1;
+  printf("\\begin{tabular}{c | c | c | c} \r\n");
+
+  /** Send html table codes */
+  printf("M & 4pk+? & Xp=(p-1)/2 & Xm=(M-1)/(6p) \\\\ \\hline \r\n");
+
+  for (i = 0; i < 35; i++) { // Recorren los números primos
+    // Take next prime: exponent
+    mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
+
+    if (find(mersenneExponents.begin(), mersenneExponents.end(), p.get_ui()) ==
+        mersenneExponents.end()) {
+
+      mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
+      mersenne--;
+      Xp = (p - 1) / 2;
+      Xm = (mersenne - 1) / (6 * p);
+
+      bf.clear();
+      bf.find(Xp);
+      XpFactors = bf.toString();
+
+      bf.clear();
+      bf.find(Xm);
+      XmFactors = bf.toString();
+
+      gmp_printf("$2^{%Zd}-1$ & %s & %Zd={$%s$} & $%s$ \\\\ \\hline \r\n",
+                 p.get_mpz_t(), type4k(p).c_str(), Xp.get_mpz_t(),
+                 XpFactors.c_str(), XmFactors.c_str());
+    }
+  }
   printf("\\end{tabular}\r\n\\end{document}\r\n");
 }
 
