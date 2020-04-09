@@ -8,6 +8,58 @@ bigHalfGearFactorizer.out -n:170141183460469231731687303715884105726
 2*3^3*7^2*19*43*73*127*337*5419*92737*649657*77158673929 (8968.79)
 */
 
+void bigHalfGearFactorizer::saveBigValue(mpz_class v) {
+
+  this->bigValues.push_back(v.get_str());
+  this->sortBigValues();
+}
+
+void bigHalfGearFactorizer::sortBigValues() {
+
+  sort(this->bigValues.begin(), this->bigValues.end());
+
+  ofstream ofs;
+  ofs.open(BIG_VALUES_FILE, ios::trunc);
+  for (string l : this->bigValues) {
+    string r = l + "\n";
+    ofs.write(r.c_str(), r.size());
+  }
+
+  ofs.flush();
+  ofs.close();
+}
+
+void bigHalfGearFactorizer::loadBigValues() {
+  ifstream ifs;
+  ifs.open(BIG_VALUES_FILE, ios::in);
+  string line;
+  while (getline(ifs, line)) {
+    this->bigValues.push_back(line);
+  }
+  ifs.close();
+
+}
+bigHalfGearFactorizer::bigHalfGearFactorizer() {
+
+  // Load big factors pre - sieved
+  if (file_exists(BIG_VALUES_FILE)) {
+    this->loadBigValues();
+  } else {
+
+    // 2^61-1
+    saveBigValue(mpz_class("2305843009213693951"));
+    // 2^89-1
+    saveBigValue(mpz_class("618970019642690137449562111"));
+    // 2^107-1
+    saveBigValue(mpz_class("162259276829213363391578010288127"));
+    // 2^127-1
+    saveBigValue(mpz_class("170141183460469231731687303715884105727"));
+
+    // Load values;
+    this->loadBigValues();
+  }
+}
+
 /*
 Factorizador de números grandes con detección de primariedad determinista
 No usa base de datos previos
@@ -34,6 +86,21 @@ void bigHalfGearFactorizer::find(mpz_class n) {
   if (n == 1)
     return;
 
+  // Find on database big numbers pre-sieved for improve speed
+  if (n.get_str().length() > PRESIEVED_DIGITS) {
+    for (int i = 0; i < this->bigValues.size(); i++) {
+      pivot = this->bigValues[i];
+      if (mpz_divisible_p(n.get_mpz_t(), pivot.get_mpz_t()) != 0) {
+        mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
+        this->factors.push_back(pivot);
+      }
+    }
+  }
+
+  // If reached end, exits.
+  if (n == 1)
+    return;
+
   // Next pivot value
   pivot = 3;
 
@@ -43,17 +110,21 @@ void bigHalfGearFactorizer::find(mpz_class n) {
   while (true) {
 
     while (true) {
-      // mpz_mod(mod.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
-      // if (mod > 0) {
       if (mpz_divisible_p(n.get_mpz_t(), pivot.get_mpz_t()) == 0) {
         break;
-        // ESTABA AQUI:  mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
       }
       mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
       mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
-
-      // n /= pivot;
       this->factors.push_back(pivot);
+
+      if (pivot.get_str().length() > PRESIEVED_DIGITS) {
+        // if doesn't exists save it
+        if (std::find(this->bigValues.begin(), this->bigValues.end(),
+                      pivot.get_str()) == this->bigValues.end()) {
+          this->saveBigValue(pivot);
+        }
+      }
+
       if (n == 1) {
         break;
       }
@@ -65,6 +136,13 @@ void bigHalfGearFactorizer::find(mpz_class n) {
 
     if (pivot > root) {
       this->factors.push_back(n);
+      if (n.get_str().length() > PRESIEVED_DIGITS) {
+        // if doesn't exists save it
+        if (std::find(this->bigValues.begin(), this->bigValues.end(),
+                      n.get_str()) == this->bigValues.end()) {
+          this->saveBigValue(n);
+        }
+      }
       break;
     }
 

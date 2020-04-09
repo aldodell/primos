@@ -1266,15 +1266,15 @@ void tirado4z(mpz_class exponent, int debugLevel) {
          "\\begin{tabular}{c | c | c | c} \r\n");
 
   /** Send html table codes */
-  printf("M & 4pk+? & Xp=(p-1)/2 & Xm=(M-1)/(2p) \\\\ \\hline \r\n");
+  printf("M & 4pk+? & Xp=(p-1)/2 & Xm=(M-1)/(6p) \\\\ \\hline \r\n");
 
-  for (i = 0; i < 33; i++) { // Recorren los números primos
+  for (i = 0; i < exponent.get_ui(); i++) { // Recorren los números primos
     // Take next prime: exponent
     mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
     mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
     mersenne--;
     Xp = (p - 1) / 2;
-    Xm = (mersenne - 1) / (2 * p);
+    Xm = (mersenne - 1) / (6 * p);
 
     bf.clear();
     bf.find(Xp);

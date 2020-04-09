@@ -171,8 +171,8 @@
             "terminal": "console",
             "program": "${workspaceRoot}/bigHalfGearFactorizer.out",
             "args": [
-                "-d:10",
-                "-n:99"
+                "-d:100",
+                "-m:127"
             ]
         }
     ]

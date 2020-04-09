@@ -155,3 +155,8 @@ std::string string_join(const std::vector<std::string> &elements,
     return os.str();
   }
 }
+
+/** Test if exists a element on a vector */
+template <typename T> bool ifExists(vector<T> &vect, T &elem) {
+  return std::find(vect.begin(), vect.end(), elem) != vect.end();
+}

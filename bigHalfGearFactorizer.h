@@ -5,7 +5,8 @@
 #include "kdutils.h"
 #include <pthread.h>
 #include <gmpxx.h>
-
+#define BIG_VALUES_FILE "bigHalfGearFactorizer.txt"
+#define PRESIEVED_DIGITS 12
 
 class bigHalfGearFactorizer {
 public:
@@ -13,7 +14,14 @@ public:
   void clear();
   void find(mpz_class n);
   string toString();
-  //bool stopThread = false;
+  vector<string> bigValues;
+  bigHalfGearFactorizer();
+  void saveBigValue(mpz_class v);
+
+  private:
+  void loadBigValues();
+  void sortBigValues();
+
 };
 
 #endif

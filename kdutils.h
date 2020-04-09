@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+
 #define CALL_MEMBER_FN(object, ptrToMember) ((object).*(ptrToMember))
 
 using namespace std;
@@ -60,11 +61,13 @@ public:
 
 private:
   size_t tIni, tSnap, tEnd;
-   unsigned int cycles = 0;
+  unsigned int cycles = 0;
 };
 
 std::string string_join(const std::vector<std::string> &elements,
                         const char *const separator);
+
+template <typename T> bool ifExists(vector<T> &vect, T &elem);
 
 #define KDUTILS_H
 #endif
