@@ -8,6 +8,14 @@ bigHalfGearFactorizer.out -n:170141183460469231731687303715884105726
 2*3^3*7^2*19*43*73*127*337*5419*92737*649657*77158673929 (8968.79)
 */
 
+bool compare(string sa, string sb) {
+  mpz_class a, b;
+  a = sa;
+  b = sb;
+
+  return mpz_cmp(a.get_mpz_t(), b.get_mpz_t()) < 0;
+}
+
 void bigHalfGearFactorizer::saveBigValue(mpz_class v) {
 
   this->bigValues.push_back(v.get_str());
@@ -16,7 +24,7 @@ void bigHalfGearFactorizer::saveBigValue(mpz_class v) {
 
 void bigHalfGearFactorizer::sortBigValues() {
 
-  sort(this->bigValues.begin(), this->bigValues.end());
+  sort(this->bigValues.begin(), this->bigValues.end(), compare);
 
   ofstream ofs;
   ofs.open(BIG_VALUES_FILE, ios::trunc);
@@ -37,7 +45,7 @@ void bigHalfGearFactorizer::loadBigValues() {
     this->bigValues.push_back(line);
   }
   ifs.close();
-
+  this->sortBigValues();
 }
 bigHalfGearFactorizer::bigHalfGearFactorizer() {
 
