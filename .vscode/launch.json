@@ -154,6 +154,18 @@
             ]
         },
         {
+            "name": "Launch Aldo 2",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/aldo2.out",
+            "args": [
+                "-a:18",
+                "-b:20",
+                "-d:10"
+            ]
+        },
+        {
             "name": "TIRADO4",
             "type": "lldb",
             "request": "launch",

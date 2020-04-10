@@ -69,5 +69,8 @@ std::string string_join(const std::vector<std::string> &elements,
 
 template <typename T> bool ifExists(vector<T> &vect, T &elem);
 
+string yesOrNot(bool booleanValue);
+
+
 #define KDUTILS_H
 #endif

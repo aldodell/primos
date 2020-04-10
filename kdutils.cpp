@@ -160,3 +160,5 @@ std::string string_join(const std::vector<std::string> &elements,
 template <typename T> bool ifExists(vector<T> &vect, T &elem) {
   return std::find(vect.begin(), vect.end(), elem) != vect.end();
 }
+
+string yesOrNot(bool booleanValue) { return booleanValue ? "yes" : "no"; }
