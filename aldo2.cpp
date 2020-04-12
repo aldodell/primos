@@ -21,11 +21,11 @@ void processA(int exp, bool putHeader) {
   mpz_class Xp;       // Exponent factor
   mpz_class Xm;       // Mersenne number special factor;
   mpz_class tmp;
-  string XpFactors;   // Exponent processed factors.
-  string XmFactors;   // Mersenne processed factors.
-  string MFactors;    // Mersenne processed factors.
-  string ks; // k from f=2*p*k+1
-  mpz_class p;        // Exponent to evaluate
+  string XpFactors; // Exponent processed factors.
+  string XmFactors; // Mersenne processed factors.
+  string MFactors;  // Mersenne processed factors.
+  string ks;        // k from f=2*p*k+1
+  mpz_class p;      // Exponent to evaluate
 
   bigHalfGearFactorizer bf;
   p = exp;
@@ -47,26 +47,24 @@ void processA(int exp, bool putHeader) {
   Xm = (mersenne - 1) / (6 * p);
   bf.clear();
   bf.find(Xp);
-  
   XpFactors = bf.toString();
+
   bf.clear();
   bf.find(Xm);
   XmFactors = bf.toString();
-  
-  ks=" ";
-  for (mpz_class k : bf.factors) {
-    k = (k - 1) / (2*p);
-    ks = ks + k.get_str() + ",";
-  }
-  ks = ks.substr(0, ks.length()-1);
 
-
+  ks = " ";
   if (!isMersenneKnowPrimeExponent(p)) {
-
     bf.clear();
     bf.find(mersenne);
     MFactors = bf.toString();
+
+    for (mpz_class k : bf.factors) {
+      k = (k - 1) / (2 * p);
+      ks = ks + k.get_str() + ",";
+    }
   }
+  ks = ks.substr(0, ks.length() - 1);
 
   // Put information on 'cout' with CSV format:
   gmp_printf("\"2^%Zd-1\"; ", p.get_mpz_t()); // 2^p-1
@@ -82,8 +80,8 @@ void processA(int exp, bool putHeader) {
   } else {
     gmp_printf("\"%Zd\"; ", mersenne.get_mpz_t()); // Factor of M
   }
-   gmp_printf("\"%s\"; ", ks.c_str()); // Ks of factors (if has)
-  
+  gmp_printf("\"%s\"; ", ks.c_str()); // Ks of factors (if has)
+
   gmp_printf("\r\n"); // End of line
 }
 
