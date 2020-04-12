@@ -20,22 +20,27 @@ void processA(int exp, bool putHeader) {
   mpz_class mersenne; // Mersenne base number
   mpz_class Xp;       // Exponent factor
   mpz_class Xm;       // Mersenne number special factor;
-  mpz_class tmp;
-  string XpFactors; // Exponent processed factors.
-  string XmFactors; // Mersenne processed factors.
-  string MFactors;  // Mersenne processed factors.
-  string ks;        // k from f=2*p*k+1
-  mpz_class p;      // Exponent to evaluate
+  mpz_class sk = 0;   // K's sum.
+  mpz_class pk = 1;   // K's product.
+  mpz_class zk = 0;   // How many k are there?
+  string XpFactors;   // Exponent processed factors.
+  string XmFactors;   // Mersenne processed factors.
+  string MFactors;    // Mersenne processed factors.
+  string ks;          // k from f=2*p*k+1
+  mpz_class p;        // Exponent to evaluate
 
   bigHalfGearFactorizer bf;
   p = exp;
 
   if (putHeader) {
     // Put header:
-    gmp_printf("\"Mersenne\"; \"p 4k+?\"; \"is prime?\"; \"Xp=(p-1)/2\"; \"Xp "
+    gmp_printf("\"Mersenne\"; \"p 4k+?\"; \"is prime?\"; "
+               "\"Xp=(p-1)/2\"; \"Xp "
                "factors\"; "
                "\"Xm=M-1/(6p)\"; "
-               "\"Xm Factors\"; \"M Factors\"; \"Factor's K\"; \r\n");
+               "\"Xm Factors\"; \"How many factors?\"; \"M Factors\"; "
+               "\"Factor's K\"; \"K's sum\"; "
+               "\"K's product\";   \r\n");
   }
 
   // Get mersenne number:
@@ -57,12 +62,17 @@ void processA(int exp, bool putHeader) {
   if (!isMersenneKnowPrimeExponent(p)) {
     bf.clear();
     bf.find(mersenne);
+    //  sort(bf.factors.begin(), bf.factors.end());
+
     MFactors = bf.toString();
 
     for (mpz_class k : bf.factors) {
       k = (k - 1) / (2 * p);
       ks = ks + k.get_str() + ",";
+      sk += k;
+      pk *= k;
     }
+    zk = bf.factors.size();
   }
   ks = ks.substr(0, ks.length() - 1);
 
@@ -70,17 +80,22 @@ void processA(int exp, bool putHeader) {
   gmp_printf("\"2^%Zd-1\"; ", p.get_mpz_t()); // 2^p-1
   gmp_printf("\"%s\"; ", is4kp1(p) ? "4k+1" : "4k+3");
   gmp_printf("\"%s\"; ", yesOrNot(isMersenneKnowPrimeExponent(p))
-                             .c_str());      // Is a know mersenne prime?
-  gmp_printf("\"%Zd\"; ", Xp.get_mpz_t());   // Xp
+                             .c_str());    // Is a know mersenne prime?
+  gmp_printf("\"%Zd\"; ", Xp.get_mpz_t()); // Xp
+
   gmp_printf("\"%s\"; ", XpFactors.c_str()); // Factor of Xp
   gmp_printf("\"%Zd\"; ", Xm.get_mpz_t());   // Xm
   gmp_printf("\"%s\"; ", XmFactors.c_str()); // Factor of Xm
+  gmp_printf("\"%Zd\"; ", zk.get_mpz_t());   // How many factors?
+
   if (!isMersenneKnowPrimeExponent(p)) {
     gmp_printf("\"%s\"; ", MFactors.c_str()); // Factor of M
   } else {
     gmp_printf("\"%Zd\"; ", mersenne.get_mpz_t()); // Factor of M
   }
-  gmp_printf("\"%s\"; ", ks.c_str()); // Ks of factors (if has)
+  gmp_printf("\"%s\"; ", ks.c_str());      // Ks of factors (if has)
+  gmp_printf("\"%Zd\"; ", sk.get_mpz_t()); // K's sum.
+  gmp_printf("\"%Zd\"; ", pk.get_mpz_t()); // K's product .
 
   gmp_printf("\r\n"); // End of line
 }

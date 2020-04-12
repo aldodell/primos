@@ -171,6 +171,8 @@ string bigHalfGearFactorizer::toString() {
     return "";
   }
 
+  sort(this->factors.begin(), this->factors.end());
+
   for (i = 0; i < this->factors.size(); i++) {
     flag = false;
     for (j = 0; j < objects.size(); j++) {
@@ -227,6 +229,8 @@ void bigHalfGearFactorizer::findMersenne(mpz_class p) {
       }
     }
   }
+
+  if(mersenne==1) return;
 
   // Establecer los parámetros para búsqueda
   p2 = 2 * p;
