@@ -184,7 +184,7 @@
             "program": "${workspaceRoot}/bigHalfGearFactorizer.out",
             "args": [
                 "-d:100",
-                "-m:127"
+                "-m:11"
             ]
         }
     ]

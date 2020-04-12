@@ -206,6 +206,75 @@ string bigHalfGearFactorizer::toString() {
   return s;
 }
 
+void bigHalfGearFactorizer::findMersenne(mpz_class p) {
+  mpz_class mersenne, pivot, p2, k, root;
+
+  // mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
+  mersenne--;
+  mpz_sqrt(root.get_mpz_t(),
+           mersenne.get_mpz_t()); // Find on database big numbers pre-sieved for
+                                  // improve speed
+
+  // Buscar el número si está en la base de datos
+  if (mersenne.get_str().length() > PRESIEVED_DIGITS) {
+    for (int i = 0; i < this->bigValues.size(); i++) {
+      pivot = this->bigValues[i];
+      if (mpz_divisible_p(mersenne.get_mpz_t(), pivot.get_mpz_t()) != 0) {
+        mpz_divexact(mersenne.get_mpz_t(), mersenne.get_mpz_t(),
+                     pivot.get_mpz_t());
+        this->factors.push_back(pivot);
+      }
+    }
+  }
+
+  // Establecer los parámetros para búsqueda
+  p2 = 2 * p;
+  k = p2 + 1;
+
+  while (true) {
+
+    //¿Es divisible?
+    if (mpz_divisible_p(mersenne.get_mpz_t(), k.get_mpz_t()) != 0) {
+      this->factors.push_back(k); // Lo pasamos como factor
+      gmp_printf("%Zd\n", k.get_mpz_t());
+
+      // Evaluamos si tenemos el número en la base de datos. Sino lo incluímos
+      if (k.get_str().length() > PRESIEVED_DIGITS) {
+        // if doesn't exists save it
+        if (std::find(this->bigValues.begin(), this->bigValues.end(),
+                      k.get_str()) == this->bigValues.end()) {
+          this->saveBigValue(k);
+        }
+      }
+
+      mpz_divexact(mersenne.get_mpz_t(), mersenne.get_mpz_t(), k.get_mpz_t());
+      if(mersenne==1) {break;}
+
+      mpz_sqrt(
+          root.get_mpz_t(),
+          mersenne.get_mpz_t()); // Find on database big numbers pre-sieved for
+
+          
+    }
+
+    k += p2;
+    if (k > root) {
+      this->factors.push_back(mersenne);
+      // Evaluamos si tenemos el número en la base de datos. Sino lo incluímos
+      if (k.get_str().length() > PRESIEVED_DIGITS) {
+        // if doesn't exists save it
+        if (std::find(this->bigValues.begin(), this->bigValues.end(),
+                      k.get_str()) == this->bigValues.end()) {
+          this->saveBigValue(k);
+        }
+      }
+
+      break;
+    }
+  }
+}
+
 #ifndef BIG_HALF_GEAR_FACTORIZER_LIB
 
 int main(int argc, char *argv[]) {
@@ -217,6 +286,7 @@ int main(int argc, char *argv[]) {
   int action = 0;
   int debugLevel = 0;
   mpz_class n;
+  kdTimer kt;
 
   argHdl.add(argument(0, (char *)"n", (char *)"number",
                       (char *)"Number to be factorized", (char *)"N"));
@@ -230,25 +300,23 @@ int main(int argc, char *argv[]) {
     action = argHdl.getAction();
     switch (action) {
     case 0:
-      // argHdl.pvalue();
       n = argHdl.value;
+      kt.start();
+      gf.find(n);
+      cout << gf.toString() << " (" << kt.stop() << ")" << endl;
       break;
     case 1:
       argHdl.pvalue(&debugLevel);
       break;
     case 2:
       n = argHdl.value;
-      mpz_ui_pow_ui(n.get_mpz_t(), 2, n.get_ui());
-      n--;
+      kt.start();
+      gf.findMersenne(n);
+      cout << gf.toString() << " (" << kt.stop() << ")" << endl;
+
       break;
     }
   }
-
-  // gf.debugLevel = debugLevel;
-  kdTimer kt;
-  kt.start();
-  gf.find(n);
-  cout << gf.toString() << " (" << kt.stop() << ")" << endl;
 
   return 0;
 }

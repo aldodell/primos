@@ -21,7 +21,8 @@ vector<unsigned int> mersenneExponents{
     30402457, 32582657, 37156667, 42643801, 43112609, 57885161, 74207281,
     77232917, 82589933};
 
-void processA(int maxPrime);
+void processA(int exp, bool putHeader);
+void processRange(int from, int to);
 bool isMersenneKnowPrimeExponent(mpz_class p);
 
 /** Return if a number is a 4k+1 */
