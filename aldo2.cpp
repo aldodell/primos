@@ -34,13 +34,13 @@ void processA(int exp, bool putHeader) {
 
   if (putHeader) {
     // Put header:
-    gmp_printf("\"Mersenne\"; \"p 4k+?\"; \"is prime?\"; "
-               "\"Xp=(p-1)/2\"; \"Xp "
-               "factors\"; "
-               "\"Xm=M-1/(6p)\"; "
-               "\"Xm Factors\"; \"How many factors?\"; \"M Factors\"; "
-               "\"Factor's K\"; \"K's sum\"; "
-               "\"K's product\";   \r\n");
+    gmp_printf("Mersenne; p 4k+?; is prime?; "
+               "Xp=(p-1)/2; Xp "
+               "factors; "
+               "Xm=M-1/(6p); "
+               "Xm Factors; How many factors?; M Factors; "
+               "Factor's K; K's sum; "
+               "K's product;   \r\n");
   }
 
   // Get mersenne number:
@@ -77,25 +77,25 @@ void processA(int exp, bool putHeader) {
   ks = ks.substr(0, ks.length() - 1);
 
   // Put information on 'cout' with CSV format:
-  gmp_printf("\"2^%Zd-1\"; ", p.get_mpz_t()); // 2^p-1
-  gmp_printf("\"%s\"; ", is4kp1(p) ? "4k+1" : "4k+3");
-  gmp_printf("\"%s\"; ", yesOrNot(isMersenneKnowPrimeExponent(p))
+  gmp_printf("'2^%Zd-1; ", p.get_mpz_t()); // 2^p-1
+  gmp_printf("'%s; ", is4kp1(p) ? "4k+1" : "4k+3");
+  gmp_printf("'%s; ", yesOrNot(isMersenneKnowPrimeExponent(p))
                              .c_str());    // Is a know mersenne prime?
-  gmp_printf("\"%Zd\"; ", Xp.get_mpz_t()); // Xp
+  gmp_printf("'%Zd; ", Xp.get_mpz_t()); // Xp
 
-  gmp_printf("\"%s\"; ", XpFactors.c_str()); // Factor of Xp
-  gmp_printf("\"%Zd\"; ", Xm.get_mpz_t());   // Xm
-  gmp_printf("\"%s\"; ", XmFactors.c_str()); // Factor of Xm
-  gmp_printf("\"%Zd\"; ", zk.get_mpz_t());   // How many factors?
+  gmp_printf("'%s; ", XpFactors.c_str()); // Factor of Xp
+  gmp_printf("'%Zd; ", Xm.get_mpz_t());   // Xm
+  gmp_printf("'%s; ", XmFactors.c_str()); // Factor of Xm
+  gmp_printf("'%Zd; ", zk.get_mpz_t());   // How many factors?
 
   if (!isMersenneKnowPrimeExponent(p)) {
-    gmp_printf("\"%s\"; ", MFactors.c_str()); // Factor of M
+    gmp_printf("'%s; ", MFactors.c_str()); // Factor of M
   } else {
-    gmp_printf("\"%Zd\"; ", mersenne.get_mpz_t()); // Factor of M
+    gmp_printf("'%Zd; ", mersenne.get_mpz_t()); // Factor of M
   }
-  gmp_printf("\"%s\"; ", ks.c_str());      // Ks of factors (if has)
-  gmp_printf("\"%Zd\"; ", sk.get_mpz_t()); // K's sum.
-  gmp_printf("\"%Zd\"; ", pk.get_mpz_t()); // K's product .
+  gmp_printf("'%s; ", ks.c_str());      // Ks of factors (if has)
+  gmp_printf("'%Zd; ", sk.get_mpz_t()); // K's sum.
+  gmp_printf("'%Zd; ", pk.get_mpz_t()); // K's product .
 
   gmp_printf("\r\n"); // End of line
 }
