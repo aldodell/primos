@@ -23,6 +23,7 @@ vector<unsigned int> mersenneExponents{
 
 void processA(int exp, bool putHeader);
 void processRange(int from, int to);
+void lookFirstK(mpz_class p);
 bool isMersenneKnowPrimeExponent(mpz_class p);
 
 /** Return if a number is a 4k+1 */

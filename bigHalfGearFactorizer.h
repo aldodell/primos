@@ -3,10 +3,10 @@
 #include "argumentsHandler.h"
 #include "bigFactorObject.h"
 #include "kdutils.h"
-#include <pthread.h>
 #include <gmpxx.h>
+#include <pthread.h>
 #define BIG_VALUES_FILE "bigHalfGearFactorizer.txt"
-#define PRESIEVED_DIGITS 12
+#define PRESIEVED_DIGITS 8
 
 class bigHalfGearFactorizer {
 public:
@@ -14,16 +14,17 @@ public:
   void clear();
   void find(mpz_class n);
   void findMersenne(mpz_class n);
-  string toString();
+  string toString(bool test4k1 = false);
+  string toString(vector<mpz_class> factors, bool test4k1 = false);
   vector<string> bigValues;
   bigHalfGearFactorizer();
   void saveBigValue(mpz_class v);
+  string divideBy(vector<mpz_class> dividend, vector<mpz_class> divisor,
+                  bool test4k1 = false);
 
-
-  private:
+private:
   void loadBigValues();
   void sortBigValues();
-
 };
 
 #endif

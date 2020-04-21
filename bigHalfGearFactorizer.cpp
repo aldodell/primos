@@ -160,31 +160,66 @@ void bigHalfGearFactorizer::find(mpz_class n) {
 
 void bigHalfGearFactorizer::clear() { this->factors.clear(); }
 
-string bigHalfGearFactorizer::toString() {
+string bigHalfGearFactorizer::divideBy(vector<mpz_class> dividend,
+                                       vector<mpz_class> divisor,
+                                       bool test4k1) {
+  std::vector<mpz_class>::iterator it0, it1;
+
+  int i = 0;
+
+  while (true) {
+    it0 = dividend.begin() + i;
+    if (it0 == dividend.end()) {
+      break;
+    }
+    it1 = std::find(divisor.begin(), divisor.end(), dividend.at(i));
+    if (it1 == divisor.end()) {
+      i++;
+    } else {
+      dividend.erase(it0);
+      divisor.erase(it1);
+    }
+  }
+
+  string p = this->toString(dividend, test4k1);
+  string q = this->toString(divisor, test4k1);
+
+  if (q.size() > 0) {
+    return p + "/" + q;
+  } else {
+    return p;
+  }
+}
+
+string bigHalfGearFactorizer::toString(bool test4k1) {
+  return this->toString(this->factors, test4k1);
+}
+
+string bigHalfGearFactorizer::toString(vector<mpz_class> factors,
+                                       bool test4k1) {
   vector<bigFactorObject> objects;
   bool flag = false;
   bigFactorObject obj;
   string s;
   int i, j;
 
-  if (this->factors.size() == 0) {
+  if (factors.size() == 0) {
     return "";
   }
 
-  sort(this->factors.begin(), this->factors.end());
+  sort(factors.begin(), factors.end());
 
-  for (i = 0; i < this->factors.size(); i++) {
+  for (i = 0; i < factors.size(); i++) {
     flag = false;
     for (j = 0; j < objects.size(); j++) {
-
-      if (objects[j].base.get_str().compare(this->factors[i].get_str()) == 0) {
+      if (objects[j].base.get_str().compare(factors[i].get_str()) == 0) {
         objects[j].exponent++;
         flag = true;
         break;
       }
     }
     if (!flag) {
-      bigFactorObject obj(this->factors[i], 1);
+      bigFactorObject obj(factors[i], 1);
       objects.push_back(obj);
     }
   }
@@ -199,6 +234,17 @@ string bigHalfGearFactorizer::toString() {
     } else {
       s = s + obj.base.get_str();
     }
+
+    if (test4k1) {
+      mpz_class t;
+      mpz_ui_pow_ui(t.get_mpz_t(), obj.base.get_ui(), obj.exponent);
+      if ((t - 1) % 4 == 0) {
+        s = s + "{4k+1}";
+      } else {
+        s = s + "{4k+3}";
+      }
+    }
+
     i++;
     if (i < objects.size()) {
       s = s + "*";
@@ -230,7 +276,8 @@ void bigHalfGearFactorizer::findMersenne(mpz_class p) {
     }
   }
 
-  if(mersenne==1) return;
+  if (mersenne == 1)
+    return;
 
   // Establecer los parámetros para búsqueda
   p2 = 2 * p;
@@ -253,13 +300,13 @@ void bigHalfGearFactorizer::findMersenne(mpz_class p) {
       }
 
       mpz_divexact(mersenne.get_mpz_t(), mersenne.get_mpz_t(), k.get_mpz_t());
-      if(mersenne==1) {break;}
+      if (mersenne == 1) {
+        break;
+      }
 
       mpz_sqrt(
           root.get_mpz_t(),
           mersenne.get_mpz_t()); // Find on database big numbers pre-sieved for
-
-          
     }
 
     k += p2;
