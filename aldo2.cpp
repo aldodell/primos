@@ -21,15 +21,17 @@ bool is4kp1(mpz_class n) {
  */
 void processA(int exp, bool putHeader) {
 
-  mpz_class mersenne;    // Mersenne base number
-  mpz_class Xp;          // Exponent factor
-  mpz_class Xm;          // Mersenne number special factor;
-  mpz_class k0;          // k in 4k+? on exponent
-  mpz_class sk = 0;      // K's sum.
-  mpz_class pk = 1;      // K's product.
-  mpz_class zk = 0;      // How many k are there?
-  string XpFactors;      // Exponent processed factors.
-  string XmFactors;      // Mersenne processed factors.
+  mpz_class mersenne; // Mersenne base number
+  mpz_class Xp;       // Exponent factor
+  mpz_class Yp;
+  mpz_class Xm;     // Mersenne number special factor;
+  mpz_class k0;     // k in 4k+? on exponent
+  mpz_class sk = 0; // K's sum.
+  mpz_class pk = 1; // K's product.
+  mpz_class zk = 0; // How many k are there?
+  string XpFactors; // Exponent processed factors.
+  string XmFactors; // Mersenne processed factors.
+  string YpFactors;
   string MFactors;       // Mersenne processed factors.
   string XmDivXMFactors; // Mersenne processed factors.
   string k0Factors;      // Factors on k on 4k+?
@@ -43,13 +45,16 @@ void processA(int exp, bool putHeader) {
 
   if (putHeader) {
     // Put header:
-    gmp_printf("Mersenne;"
+    gmp_printf("p;"
+               "Mersenne;"
                "p 4k+?;"
                "k in 4k+?;"
                "is prime?;"
                "digits;"
                "Xp=(p-1)/2;"
                "Xp factors;"
+               "Yp=(p+1)/2;"
+               "Y factors;"
                "Xm=M-1/(6p);"
                "Xm Factors;"
                "How many factors?;"
@@ -58,7 +63,7 @@ void processA(int exp, bool putHeader) {
                "K's sum; "
                "K's product;"
                "Xm/Xp;"
-               "\r\n");
+               "\n");
   }
 
   // Get mersenne number:
@@ -87,6 +92,8 @@ void processA(int exp, bool putHeader) {
 
     MFactors = bf1.toString();
 
+    std::sort(bf1.factors.begin(), bf1.factors.end());
+
     for (mpz_class k : bf1.factors) {
       k = (k - 1) / (2 * p);
       ks = ks + k.get_str() + ",";
@@ -107,29 +114,39 @@ void processA(int exp, bool putHeader) {
   bf1.find(k0);
   k0Factors = bf1.toString(true);
 
+  // Yp & Yp factors
+  Yp = (p+1) / 2;
+  bf1.clear();
+  bf1.find(Yp);
+  std::sort(bf1.factors.begin(), bf1.factors.end());
+  YpFactors = bf1.toString(true);
+
   // Put information on 'cout' with CSV format:
-  gmp_printf("'2^%Zd-1;", p.get_mpz_t()); // 2^p-1
-  gmp_printf("'%s;", is4kp1(p) ? "4k+1" : "4k+3");
-  gmp_printf("'%s;", k0Factors.c_str());
-  gmp_printf("'%s;", yesOrNot(isMersenneKnowPrimeExponent(p)).c_str());
-  gmp_printf("'%Zd;", digits.get_mpz_t()); // Digits
-  gmp_printf("'%Zd;", Xp.get_mpz_t());     // Xp
-  gmp_printf("'%s;", XpFactors.c_str());   // Factor of Xp
-  gmp_printf("'%Zd;", Xm.get_mpz_t());     // Xm
-  gmp_printf("'%s;", XmFactors.c_str());   // Factor of Xm
-  gmp_printf("'%Zd;", zk.get_mpz_t());     // How many factors?
+  gmp_printf("%Zd;", p.get_mpz_t());     // 2^p-1
+  gmp_printf("2^%Zd-1;", p.get_mpz_t()); // 2^p-1
+  gmp_printf("%s;", is4kp1(p) ? "4k+1" : "4k+3");
+  gmp_printf("%s;", k0Factors.c_str());
+  gmp_printf("%s;", yesOrNot(isMersenneKnowPrimeExponent(p)).c_str());
+  gmp_printf("%Zd;", digits.get_mpz_t()); // Digits
+  gmp_printf("%Zd;", Xp.get_mpz_t());     // Xp
+  gmp_printf("'%s;", XpFactors.c_str());  // Factor of Xp
+  gmp_printf("%Zd;", Yp.get_mpz_t());     // Yp
+  gmp_printf("'%s;", YpFactors.c_str());  // Factor of Yp
+  gmp_printf("'%Zd;", Xm.get_mpz_t());    // Xm
+  gmp_printf("'%s;", XmFactors.c_str());  // Factor of Xm
+  gmp_printf("'%Zd;", zk.get_mpz_t());    // How many factors?
 
   if (!isMersenneKnowPrimeExponent(p)) {
     gmp_printf("'%s;", MFactors.c_str()); // Factor of M
   } else {
     gmp_printf("'%Zd;", mersenne.get_mpz_t()); // Factor of M
   }
-  gmp_printf("'%s;", ks.c_str());             // Ks of factors (if has)
+  gmp_printf("'%s';", ks.c_str());            // Ks of factors (if has)
   gmp_printf("'%Zd;", sk.get_mpz_t());        // K's sum.
   gmp_printf("'%Zd;", pk.get_mpz_t());        // K's product .
   gmp_printf("'%s;", XmDivXMFactors.c_str()); // K's product .
 
-  gmp_printf("\r\n"); // End of line
+  gmp_printf("\n"); // End of line
 }
 
 /** Loop for evaluate some p on 2^p-1 */
