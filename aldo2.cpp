@@ -12,9 +12,23 @@ bool isMersenneKnowPrimeExponent(mpz_class p) {
 
 /** Return if a number is a 4k+1 */
 bool is4kp1(mpz_class n) {
-  if (n == 2)
+
+  int t = n.get_ui() % 4;
+  if (t == 1 || t == 2) {
     return true;
-  return ((n - 1) % 4 == 0);
+  } else {
+    return false;
+  }
+}
+
+/** Return 1 or 7, dependig wich digit M finish */
+int lastDigit(mpz_class exponent) {
+  mpz_class t = exponent / 2;
+  if (mpz_tstbit(t.get_mpz_t(), 0) == 1) {
+    return 7;
+  } else {
+    return 1;
+  }
 }
 
 /* Retrieve Mersenne numbers information and trasnform it into CSV information
@@ -29,6 +43,7 @@ void processA(int exp, bool putHeader) {
   mpz_class sk = 0; // K's sum.
   mpz_class pk = 1; // K's product.
   mpz_class zk = 0; // How many k are there?
+
   string XpFactors; // Exponent processed factors.
   string XmFactors; // Mersenne processed factors.
   string YpFactors;
@@ -39,6 +54,8 @@ void processA(int exp, bool putHeader) {
   string ks;        // k from f=2*p*k+1
   mpz_class p;      // Exponent to evaluate
   mpz_class digits; // Digits of mersenne number
+
+  vector<mpz_class> kss; // Vector of k's
 
   bigHalfGearFactorizer bf1, bf2;
   p = exp;
@@ -51,6 +68,7 @@ void processA(int exp, bool putHeader) {
                "k in 4k+?;"
                "is prime?;"
                "digits;"
+               "M last digit;"
                "Xp=(p-1)/2;"
                "Xp factors;"
                "Yp=(p+1)/2;"
@@ -62,8 +80,12 @@ void processA(int exp, bool putHeader) {
                "Factor's K;"
                "K's sum; "
                "K's product;"
-               "Xm/Xp;"
-               "\n");
+               "Xm/Xp;");
+
+    for (int i = 0; i < 10; i++) {
+      gmp_printf("k%d;", i);
+    }
+    printf("\n");
   }
 
   // Get mersenne number:
@@ -89,14 +111,13 @@ void processA(int exp, bool putHeader) {
   if (!isMersenneKnowPrimeExponent(p)) {
     bf1.clear();
     bf1.find(mersenne);
-
     MFactors = bf1.toString();
-
     std::sort(bf1.factors.begin(), bf1.factors.end());
 
     for (mpz_class k : bf1.factors) {
       k = (k - 1) / (2 * p);
       ks = ks + k.get_str() + ",";
+      kss.push_back(k);
       sk += k;
       pk *= k;
     }
@@ -113,9 +134,12 @@ void processA(int exp, bool putHeader) {
   bf1.clear();
   bf1.find(k0);
   k0Factors = bf1.toString(true);
+  if (k0Factors.length() == 0) {
+    k0Factors = "1";
+  }
 
   // Yp & Yp factors
-  Yp = (p+1) / 2;
+  Yp = (p + 1) / 2;
   bf1.clear();
   bf1.find(Yp);
   std::sort(bf1.factors.begin(), bf1.factors.end());
@@ -128,13 +152,15 @@ void processA(int exp, bool putHeader) {
   gmp_printf("%s;", k0Factors.c_str());
   gmp_printf("%s;", yesOrNot(isMersenneKnowPrimeExponent(p)).c_str());
   gmp_printf("%Zd;", digits.get_mpz_t()); // Digits
-  gmp_printf("%Zd;", Xp.get_mpz_t());     // Xp
-  gmp_printf("'%s;", XpFactors.c_str());  // Factor of Xp
-  gmp_printf("%Zd;", Yp.get_mpz_t());     // Yp
-  gmp_printf("'%s;", YpFactors.c_str());  // Factor of Yp
-  gmp_printf("'%Zd;", Xm.get_mpz_t());    // Xm
-  gmp_printf("'%s;", XmFactors.c_str());  // Factor of Xm
-  gmp_printf("'%Zd;", zk.get_mpz_t());    // How many factors?
+  gmp_printf("%d;", lastDigit(p));        // Last Mersenne digit
+
+  gmp_printf("%Zd;", Xp.get_mpz_t());    // Xp
+  gmp_printf("'%s;", XpFactors.c_str()); // Factor of Xp
+  gmp_printf("%Zd;", Yp.get_mpz_t());    // Yp
+  gmp_printf("'%s;", YpFactors.c_str()); // Factor of Yp
+  gmp_printf("'%Zd;", Xm.get_mpz_t());   // Xm
+  gmp_printf("'%s;", XmFactors.c_str()); // Factor of Xm
+  gmp_printf("'%Zd;", zk.get_mpz_t());   // How many factors?
 
   if (!isMersenneKnowPrimeExponent(p)) {
     gmp_printf("'%s;", MFactors.c_str()); // Factor of M
@@ -145,6 +171,11 @@ void processA(int exp, bool putHeader) {
   gmp_printf("'%Zd;", sk.get_mpz_t());        // K's sum.
   gmp_printf("'%Zd;", pk.get_mpz_t());        // K's product .
   gmp_printf("'%s;", XmDivXMFactors.c_str()); // K's product .
+
+  // Put all k, cell by cell
+  for (mpz_class kt : kss) {
+    gmp_printf("\'%Zd;", kt.get_mpz_t()); // k.
+  }
 
   gmp_printf("\n"); // End of line
 }
@@ -165,45 +196,122 @@ void processRange(int from, int to) {
 void lookFirstK(mpz_class p) {
 
   mpz_class mersenne; // Mersenne base number
-  mpz_class Xp, XpFactors, p2, k, root, f;
+  mpz_class Xp, XpFactors, p2, k, root, f, finish;
   bigHalfGearFactorizer bf;
+  unsigned int t = 0;
 
   // Get mersenne number:
   mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
   mersenne--;
   Xp = (p - 1) / 2;
 
+  // factorizing XP
+  bf.clear();
+  bf.find(Xp);
+
   // Detect if is a 4k+3:
   if (is4kp1(p)) {
     gmp_printf("Is a 4k+1\n");
-    return;
+  } else {
+    gmp_printf("Is a 4k+3\n");
   }
 
+  gmp_printf("Xp factors: %s \n", bf.toString().c_str());
+
+  finish = p / 2;
+  if (mpz_tstbit(finish.get_mpz_t(), 1) == 1) {
+    gmp_printf("M finish with 7\n");
+  } else {
+    gmp_printf("M finish with 1\n");
+  }
+
+  /*
   if (mpz_divisible_ui_p(Xp.get_mpz_t(), 2) != 0) {
-    gmp_printf("Has 2 factor.\n");
+    gmp_printf("p has 2 factor.\n");
     return;
   }
 
   if (mpz_divisible_ui_p(Xp.get_mpz_t(), 3) != 0) {
-    gmp_printf("Has 3 factor.\n");
+    gmp_printf("p has 3 factor.\n");
     return;
   }
+  */
 
   p2 = 2 * p;
   f = p2 + 1;
   k = 1;
+
+  printf("Calculating square root. ");
+  cout.flush();
   mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+  printf("Done!\n");
 
   while (mpz_divisible_p(mersenne.get_mpz_t(), f.get_mpz_t()) == 0) {
-    f += p2;
-    if (k > root) {
+    if (f > root) {
       printf("Is prime.\n");
       return;
     }
+    f += p2;
     k++;
+    t++;
+    if (t == 1000) {
+      t = 0;
+      gmp_printf("k=%Zd\n", k.get_mpz_t());
+      cout.flush();
+    }
   }
 
   gmp_printf("First k=%Zd, f=%Zd\n", k.get_mpz_t(), f.get_mpz_t());
+}
+
+void primarityTest(unsigned int exponent) {
+
+  mpz_class k0, k1; // K en los factores de la forma 2pk+1
+  mpz_class f0, f1; // Factores de 2^p-1
+  mpz_class mersenne;
+  unsigned int digitsOfmersenne;  // Dígitos del número de mersenne
+  unsigned int lastDigitMersenne; //  Último dígito del Mersenne
+  unsigned int lastDigitF0;       //  Último dígito del factor 0
+  unsigned int lastDigitF1;       //  Último dígito del factor 0
+  unsigned int p2;                // Exponente * 2
+
+  // Calcular la cantidad de dígitos del número de Mersenne
+  digitsOfmersenne = exponent * log10(2) + 1;
+
+  // Determinar si el Mersenne termina en 7 o en 1
+  lastDigitMersenne = exponent / 2;
+  if (lastDigitMersenne && 1 == 1) {
+    lastDigitMersenne = 7;
+  } else {
+    lastDigitMersenne = 1;
+  }
+
+  // Iniciamos con k0 = 1 para indicar que el primer "posible factor" es el más
+  // bajo
+  k0 = 1;
+
+  // Algunos precálculos
+  p2 = exponent * 2;
+
+  int ex = 332192809;
+
+  mpz_ui_pow_ui(f1.get_mpz_t(), 2, ex);
+  f1 = f1 - 1;
+
+  // Get mersenne number:
+  // mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
+  // mersenne--;
+
+  f1 = (f1 - 1) / (2 * ex);
+  gmp_printf("%Zd", f1.get_mpz_t());
+
+  // Evaluamos el dígito final del mersenne y decidimos cual k0 iniciará la
+  // cuenta
+
+  // while (true) {
+  // f0 = p2 * k0 + 1;
+
+  //}
 }
 
 int main(int argc, char *argv[]) {
@@ -212,8 +320,9 @@ int main(int argc, char *argv[]) {
   int debugLevel;
   int action;
   int maxPrime;
-  int p;
+  int64 p;
   int from, to;
+  mpz_class exp;
 
   argHdl.add(argument(0, (char *)"d", (char *)"debug", (char *)"Debug level",
                       (char *)"N"));
@@ -234,8 +343,12 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(5, (char *)"k", (char *)"test",
                       (char *)"Test for a particular p", (char *)"N"));
 
+  argHdl.add(argument(6, (char *)"j", (char *)"J",
+                      (char *)"Test for a particular p", (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
+
     switch (action) {
 
     case 0:
@@ -261,7 +374,13 @@ int main(int argc, char *argv[]) {
 
     case 5:
       argHdl.pvalue(&p);
-      lookFirstK(p);
+      exp = (unsigned int)p;
+      lookFirstK(exp);
+      break;
+
+    case 6:
+      argHdl.pvalue(&p);
+      primarityTest(p);
       break;
     }
   }

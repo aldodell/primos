@@ -228,6 +228,14 @@ string bigHalfGearFactorizer::toString(vector<mpz_class> factors,
   sort(objects.begin(), objects.end(), bigFactorObjectCompare);
 
   i = 0;
+
+  /*
+    if (objects.size() == 0) {
+      bigFactorObject obj(1, 1);
+      objects.push_back(obj);
+    }
+    */
+
   for (bigFactorObject obj : objects) {
     if (obj.exponent > 1) {
       s = s + obj.base.get_str() + "^" + to_string(obj.exponent);
@@ -236,9 +244,10 @@ string bigHalfGearFactorizer::toString(vector<mpz_class> factors,
     }
 
     if (test4k1) {
-      mpz_class t;
+      mpz_class t, tt;
       mpz_ui_pow_ui(t.get_mpz_t(), obj.base.get_ui(), obj.exponent);
-      if ((t - 1) % 4 == 0) {
+      mpz_mod_ui(tt.get_mpz_t(), t.get_mpz_t(), 4);
+      if (tt == 1 || tt == 2) {
         s = s + "{4k+1}";
       } else {
         s = s + "{4k+3}";
