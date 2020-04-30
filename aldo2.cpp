@@ -303,7 +303,7 @@ void primarityTest(unsigned int exponent) {
   // mersenne--;
 
   f1 = (f1 - 1) / (2 * ex);
-  gmp_printf("%Zd", f1.get_mpz_t());
+  gmp_printf("%10Zd", f1.get_mpz_t());
 
   // Evaluamos el dígito final del mersenne y decidimos cual k0 iniciará la
   // cuenta
@@ -314,6 +314,51 @@ void primarityTest(unsigned int exponent) {
   //}
 }
 
+void analysis(unsigned int p, unsigned int limit) {
+  setlocale(LC_ALL, "da-DK");
+  mpz_class mersenne, Xp, Xm, p2, k, first, fa, fb, ma, mb, dmab;
+  mpz_class diva, divb, root, rootLimit;
+
+  int i;
+
+  // Get mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
+  mersenne--;
+
+  Xm = (mersenne - 1) / 2;
+  p2 = 2 * p;
+  first = (mersenne - 1) / p2;
+
+  mpz_root(root.get_mpz_t(), mersenne.get_mpz_t(), 2);
+  rootLimit = root / p2;
+
+  gmp_printf("M: %'Zd\n", mersenne.get_mpz_t());
+  gmp_printf("Limit: %'Zd\n", first.get_mpz_t());
+  gmp_printf("Root: %'Zd\n", root.get_mpz_t());
+  gmp_printf("Root limit: %'Zd\n", rootLimit.get_mpz_t());
+
+  if (limit == 0)
+    limit = first.get_ui();
+
+  printf("%15s %15s %15s %15s %15s %15s %15s %15s\n", "k", "2pk", "(M-1)/(2pk)",
+         "2pk+1", "M/(2pk+1)", "(M-1)%(2pk)", "M%(2pk+1)", "Dif");
+  for (k = 1; k <= limit; k++) {
+
+    fa = p2 * k;
+    fb = fa + 1;
+    ma = (mersenne - 1) % fa;
+    mb = (mersenne) % fb;
+    dmab = ma - mb;
+    diva = (mersenne - 1) / fa;
+    divb = (mersenne) / fb;
+
+    gmp_printf("%15Zd %15Zd %15Zd %15Zd %15Zd %15Zd %15Zd %15Zd\n",
+               k.get_mpz_t(), fa.get_mpz_t(), diva.get_mpz_t(), fb.get_mpz_t(),
+               divb.get_mpz_t(), ma.get_mpz_t(), mb.get_mpz_t(),
+               dmab.get_mpz_t());
+  }
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent, speed;
@@ -321,7 +366,8 @@ int main(int argc, char *argv[]) {
   int action;
   int maxPrime;
   int64 p;
-  int from, to;
+  int from = 0;
+  int to = 0;
   mpz_class exp;
 
   argHdl.add(argument(0, (char *)"d", (char *)"debug", (char *)"Debug level",
@@ -345,6 +391,9 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(6, (char *)"j", (char *)"J",
                       (char *)"Test for a particular p", (char *)"N"));
+
+  argHdl.add(argument(7, (char *)"a", (char *)"A",
+                      (char *)"Analysis particular p", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -381,6 +430,11 @@ int main(int argc, char *argv[]) {
     case 6:
       argHdl.pvalue(&p);
       primarityTest(p);
+      break;
+
+    case 7:
+      argHdl.pvalue(&p);
+      analysis(p, to);
       break;
     }
   }
