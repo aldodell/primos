@@ -1,0 +1,159 @@
+<html>
+
+<input type="range" id="range" min="1" max="32">
+<canvas height="1000px" width="1000px" id="canvas"></canvas>
+
+<script>
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    var zoom = 1;
+    var x = 400;
+    var y = 400;
+    var radiusIni = 50;
+    var radiusPivot = 5;
+    var mersennePrev = 0;
+    var deltaAngle = 0.1;
+    var timer0;
+    var pAngle;
+
+    var rangeBtn = document.getElementById("range");
+
+    function clearCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.save();
+        ctx.globalCompositeOperation = 'copy';
+        ctx.strokeStyle = 'transparent';
+        ctx.beginPath();
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawMersenne(p) {
+        //var mersenne = Math.pow(2, p) - 1;
+        var radius = zoom * p / 2 * Math.PI; //mersenne / (2 * Math.PI);
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+
+
+    function drawMainGear() {
+        //Draw main circle:
+        var radius = zoom / 2 * Math.PI; //mersenne / (2 * Math.PI);
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        var mersenne = Math.pow(2, p) - 1 - mersennePrev;
+        mersennePrev += mersenne;
+        var angle = mersenne * Math.PI;
+        pAngle = 0;
+
+
+        timer0 = window.setInterval(drawPivot, 100, angle);
+    }
+
+    function drawPivot(angle) {
+        if(pAngle > angle) window.clearInterval(timer0);
+        pAngle += 0.001;
+        var radius = zoom / 2 * Math.PI; //mersenne / (2 * Math.PI);
+        var x0 = x + (radius * Math.cos(pAngle));
+        var y0 = y + (radius * Math.sin(pAngle));
+        ctx.fillStyle = 'blue';
+        ctx.beginPath();
+        ctx.arc(x0, y0, radiusPivot, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+
+    /*
+        function drawGear(p) {
+    
+            //Draw main circle:
+            var radius = zoom / 2 * Math.PI; //mersenne / (2 * Math.PI);
+    
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+    
+            var mersenne = Math.pow(2, p) - 1 - mersennePrev;
+            mersennePrev += mersenne;
+            var angle = mersenne * Math.PI;
+            var pAngle = 0;
+    
+            while (pAngle < angle) {
+                pAngle += deltaAngle;
+                if (pAngle > angle) window.clearInterval(timer);
+                var x0 = x + (radius * Math.cos(pAngle));
+                var y0 = y + (radius * Math.sin(pAngle));
+                ctx.fillStyle = 'blue';
+                ctx.beginPath();
+                ctx.arc(x0, y0, radiusPivot, 0, 2 * Math.PI);
+                ctx.fill();
+                sleep(100);
+            }
+    
+    
+    
+    
+        }
+        */
+
+    function sleep(milliseconds) {
+        var t = Date.now();
+        while (true) {
+            if (Date.now() - t > milliseconds) break;
+        }
+    }
+
+    function drawAll() {
+        clearCanvas(canvas);
+        mersennePrev = 0;
+        drawMainGear();
+        drawGear(2);
+
+        /*
+        drawGear(3);
+        drawGear(5);
+        drawGear(7);
+        drawGear(13);
+        drawGear(17);
+        drawGear(19);
+        */
+
+
+
+        /*
+        drawMersenne(2);
+        drawMersenne(3);
+        drawMersenne(5);
+        drawMersenne(7);
+        drawMersenne(13);
+        drawMersenne(17);
+        drawMersenne(19);
+        drawMersenne(31);
+        drawMersenne(61);
+        */
+
+    }
+
+    rangeBtn.addEventListener("change", function (e) {
+        zoom = 0.000001 * Math.pow(2, e.target.value);
+        drawAll();
+    });
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+</html>

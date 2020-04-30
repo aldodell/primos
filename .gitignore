@@ -1,5 +1,4 @@
 *.out.dSYM
 *.bin
 *.out
-*.htm*
 .DS_Store
