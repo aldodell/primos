@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
+#include <locale>
 
 #define CALL_MEMBER_FN(object, ptrToMember) ((object).*(ptrToMember))
 
@@ -55,13 +55,13 @@ private:
 class kdProcessBenchmark {
 public:
   unsigned int cyclesForStep = 1000000;
-  void tick();
+  unsigned int cycles = 0;
+  bool tick();
   void start();
   void stop();
 
 private:
   size_t tIni, tSnap, tEnd;
-  unsigned int cycles = 0;
 };
 
 std::string string_join(const std::vector<std::string> &elements,
@@ -70,7 +70,6 @@ std::string string_join(const std::vector<std::string> &elements,
 template <typename T> bool ifExists(vector<T> &vect, T &elem);
 
 string yesOrNot(bool booleanValue);
-
 
 #define KDUTILS_H
 #endif

@@ -122,16 +122,22 @@ void kdProcessBenchmark::start() {
   this->tSnap = tIni;
 }
 
-void kdProcessBenchmark::tick() {
+/** Return true if end isn't reached and must be continuing execution.
+ * Return false if end is reached.
+ * */
+bool kdProcessBenchmark::tick() {
   this->cycles++;
   if (this->cycles == this->cyclesForStep) {
+
     size_t tmp = clock();
     double t = (double)(tmp - this->tSnap) / CLOCKS_PER_SEC;
-    printf("Cycles: %d in %f seconds. %d cycles/sec\n", this->cycles, t,
+    printf("Cycles: %'u in %f seconds. %'u cycles/sec\n", this->cycles, t,
            int(this->cycles / t));
     this->tSnap = tmp;
     this->cycles = 0;
+    return false;
   }
+  return true;
 }
 
 void kdProcessBenchmark::stop() {

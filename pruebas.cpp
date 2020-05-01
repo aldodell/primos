@@ -6,28 +6,23 @@
 #include <gmpxx.h>
 //#include <thread>
 
+/**
+ * Área de pruebas de operaciones cíclicas
+ * */
+
 int main(int argc, char *argv[]) {
+  kdProcessBenchmark benchmarker;
+  benchmarker.cyclesForStep = 10000;
 
-  int i = 1000000000;
-  kdTimer kt;
-  mpz_class a;
-  mpz_ui_pow_ui(a.get_mpz_t(), 2, 64);
- 
-  a /= 20;
-  a /= 1000000000;
-  
-  gmp_printf("bytes: %Zd \n\r", a.get_mpz_t());
+  /** Test fields */
+  float f = 0;
 
-  //  int64 a;
-  a = 0;
-
-  kt.start();
-  while (true) {
-    a++;
-    if (a == i)
-      break;
+  benchmarker.start();
+  while (benchmarker.tick()) {
+    /**       Coloque código de prueba aqui */
+    f++;
+    /** fin de Area de prueba */
   }
-  cout << kt.stop() << endl;
-
+  benchmarker.stop();
   exit(0);
 }

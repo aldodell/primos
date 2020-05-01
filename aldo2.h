@@ -26,8 +26,8 @@ void processRange(int from, int to);
 void lookFirstK(mpz_class p);
 bool isMersenneKnowPrimeExponent(mpz_class p);
 void primarityTest(unsigned int exponent);
-
-void analysis(unsigned int p, unsigned int limit=0); 
+void analysis(unsigned int p, unsigned int limit = 0);
+void analysis2(unsigned to=1000);
 
 /** Return if a number is a 4k+1 */
 bool is4kp1(mpz_class n);

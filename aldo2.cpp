@@ -12,7 +12,6 @@ bool isMersenneKnowPrimeExponent(mpz_class p) {
 
 /** Return if a number is a 4k+1 */
 bool is4kp1(mpz_class n) {
-
   int t = n.get_ui() % 4;
   if (t == 1 || t == 2) {
     return true;
@@ -359,6 +358,39 @@ void analysis(unsigned int p, unsigned int limit) {
   }
 }
 
+/** Calcula mersenne, lo divide por 2pk+1 y calcula el módulo */
+void analysis2(unsigned to) {
+  mpz_class mersenne, p, f, k, mod;
+  bigHalfGearFactorizer bf;
+
+  p = 3;
+  printf("p;m;Xp;p:4k+?;k:4k+?\n");
+  for (int i = 0; i < to; i++) {
+    // Get mersenne
+    mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p.get_ui());
+    mersenne--;
+    f = (2 * p) + 1;
+    mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), f.get_mpz_t());
+    gmp_printf("%'Zd;", p.get_mpz_t());   // p
+    gmp_printf("%'Zd;", mod.get_mpz_t()); // m
+    bf.clear();
+    bf.find((p - 1) / 2);
+    printf("%s;", bf.toString().c_str());
+    if (is4kp1(p)) {
+      printf("4k+1;");
+      k = (p - 1) / 4;
+    } else {
+      printf("4k+3;");
+      k = (p - 3) / 4;
+    }
+    bf.clear();
+    bf.find(k);
+    gmp_printf("%s;", bf.toString(true).c_str()); // k
+    printf("\n");
+    mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
+  }
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent, speed;
@@ -394,6 +426,8 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(7, (char *)"a", (char *)"A",
                       (char *)"Analysis particular p", (char *)"N"));
+  argHdl.add(
+      argument(8, (char *)"b", (char *)"B", (char *)"Analysis 2", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -435,6 +469,11 @@ int main(int argc, char *argv[]) {
     case 7:
       argHdl.pvalue(&p);
       analysis(p, to);
+      break;
+
+    case 8:
+      // argHdl.pvalue(&p);
+      analysis2(to);
       break;
     }
   }
