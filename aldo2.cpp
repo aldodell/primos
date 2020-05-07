@@ -337,6 +337,7 @@ void primarityTest(unsigned int exponent) {
 void primarityTest2(unsigned int p) {
   mpz_class a, b, f, p2, p2p1, q, r;
   mpz_class mersenne, omega, omegam1;
+  kdProcessBenchmark benchmark;
 
   p2 = 2 * p;
   p2p1 = p2 + 1;
@@ -351,8 +352,10 @@ void primarityTest2(unsigned int p) {
   a = 1;
   b = (omega - a) / (p2 * a + 1);
 
+  benchmark.cyclesForStep = 1000000;
+  benchmark.start();
   while (true) {
-
+    benchmark.tick();
     f = p2 * a * b + a + b;
     if (f == omega) {
       gmp_printf("Ks: %Zd, %Zd\a\n", a.get_mpz_t(), b.get_mpz_t());
@@ -368,6 +371,7 @@ void primarityTest2(unsigned int p) {
       b = (omega - a) / (p2 * a + 1);
     }
   }
+  benchmark.stop();
 
   /*
     while (true) {

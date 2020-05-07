@@ -160,7 +160,7 @@
             "terminal": "console",
             "program": "${workspaceRoot}/aldo2.out",
             "args": [
-                "-l:29",
+                "-l:43",
                 "-d:10"
             ]
         },
