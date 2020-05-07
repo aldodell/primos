@@ -339,11 +339,12 @@ void primarityTest2(unsigned int p) {
   mpz_class mersenne, omega, omegam1;
   kdProcessBenchmark benchmark;
 
+  bool upDownFlag = true; // up: true, down: falsea
+
   p2 = 2 * p;
   p2p1 = p2 + 1;
   q = 2;
   r = 2;
-
   mpz_ui_pow_ui(omega.get_mpz_t(), 2, p);
   omega = (omega - 2) / (2 * p);
   // omegam1 = omega - 1;
@@ -364,11 +365,18 @@ void primarityTest2(unsigned int p) {
       a = a + q - 1;
       q *= 2;
       r = 1;
+      if (!upDownFlag) {
+        upDownFlag = true;
+        b = (omega - a) / (p2 * a + 1);
+      }
     } else {
       a = a - r + 1;
       r *= 2;
       q = 1;
-      b = (omega - a) / (p2 * a + 1);
+      if (upDownFlag) {
+        upDownFlag = false;
+        b = (omega - a) / (p2 * a + 1);
+      }
     }
   }
   benchmark.stop();
