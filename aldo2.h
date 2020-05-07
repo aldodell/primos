@@ -22,12 +22,15 @@ vector<unsigned int> mersenneExponents{
     77232917, 82589933};
 
 void processA(int exp, bool putHeader);
+
+void processB(int exp, bool putHeader);
 void processRange(int from, int to);
 void lookFirstK(mpz_class p);
 bool isMersenneKnowPrimeExponent(mpz_class p);
 void primarityTest(unsigned int exponent);
+void primarityTest2(unsigned int p); 
 void analysis(unsigned int p, unsigned int limit = 0);
-void analysis2(unsigned to=1000);
+void analysis2(unsigned int to=1000, unsigned int from=0);
 
 /** Return if a number is a 4k+1 */
 bool is4kp1(mpz_class n);

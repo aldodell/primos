@@ -59,7 +59,7 @@
                 "-std=c++1z",
                 "-stdlib=libc++",
                 "kdutils.cpp",
-                //"argumentsHandler.cpp",
+                "argumentsHandler.cpp",
                 //"bigFactorObject.cpp",
                 //"bigGearsFactorizer.cpp",
                 "pruebas.cpp",

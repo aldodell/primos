@@ -179,6 +179,26 @@ void processA(int exp, bool putHeader) {
   gmp_printf("\n"); // End of line
 }
 
+void processB() {
+  bigHalfGearFactorizer bf1;
+  mpz_class p, Xp;
+
+  printf("p;p 4k+?;Xp\n");
+
+  for (int i = 0; i < 51; i++) {
+    p = mersenneExponents[i];
+    Xp = (p - 1) / 2;
+
+    bf1.clear();
+    bf1.find(Xp);
+
+    gmp_printf("%Zd;", p.get_mpz_t());
+    gmp_printf("%s;", is4kp1(p) ? "4k+1" : "4k+3");
+    gmp_printf("%s", bf1.toString(true).c_str());
+    printf("\n");
+  }
+}
+
 /** Loop for evaluate some p on 2^p-1 */
 void processRange(int from, int to) {
   mpz_class p = from;
@@ -263,6 +283,7 @@ void lookFirstK(mpz_class p) {
   gmp_printf("First k=%Zd, f=%Zd\n", k.get_mpz_t(), f.get_mpz_t());
 }
 
+/** POR DESARROLLAR */
 void primarityTest(unsigned int exponent) {
 
   mpz_class k0, k1; // K en los factores de la forma 2pk+1
@@ -313,6 +334,58 @@ void primarityTest(unsigned int exponent) {
   //}
 }
 
+void primarityTest2(unsigned int p) {
+  mpz_class a, b, f, p2, p2p1, q, r;
+  mpz_class mersenne, omega, omegam1;
+
+  p2 = 2 * p;
+  p2p1 = p2 + 1;
+  q = 2;
+  r = 2;
+
+  mpz_ui_pow_ui(omega.get_mpz_t(), 2, p);
+  omega = (omega - 2) / (2 * p);
+  // omegam1 = omega - 1;
+
+  // First intent:
+  a = 1;
+  b = (omega - a) / (p2 * a + 1);
+
+  while (true) {
+
+    f = p2 * a * b + a + b;
+    if (f == omega) {
+      gmp_printf("Ks: %Zd, %Zd\a\n", a.get_mpz_t(), b.get_mpz_t());
+      return;
+    } else if (f < omega) {
+      a = a + q - 1;
+      q *= 2;
+      r = 1;
+    } else {
+      a = a - r + 1;
+      r *= 2;
+      q = 1;
+      b = (omega - a) / (p2 * a + 1);
+    }
+  }
+
+  /*
+    while (true) {
+      f = p2 * a * b + a + b;
+      if (f == omega) {
+        gmp_printf("Ks: %Zd, %Zd\n", a.get_mpz_t(), b.get_mpz_t());
+        return;
+      } else if (f < omega) {
+        a += q;
+        q *= 2;
+      } else {
+        a -=
+      }
+      b = (omega - a) / (p2 * a + 1);
+    }
+    */
+}
+
 void analysis(unsigned int p, unsigned int limit) {
   setlocale(LC_ALL, "da-DK");
   mpz_class mersenne, Xp, Xm, p2, k, first, fa, fb, ma, mb, dmab;
@@ -339,8 +412,8 @@ void analysis(unsigned int p, unsigned int limit) {
   if (limit == 0)
     limit = first.get_ui();
 
-  printf("%15s %15s %15s %15s %15s %15s %15s %15s\n", "k", "2pk", "(M-1)/(2pk)",
-         "2pk+1", "M/(2pk+1)", "(M-1)%(2pk)", "M%(2pk+1)", "Dif");
+  printf("%15s %15s %15s %15s %15s %15s %15s \n", "k", "2pk", "(M-1)/(2pk)",
+         "2pk+1", "M/(2pk+1)", "(M-1)%(2pk)", "M%(2pk+1)" /*, "Dif"*/);
   for (k = 1; k <= limit; k++) {
 
     fa = p2 * k;
@@ -351,17 +424,18 @@ void analysis(unsigned int p, unsigned int limit) {
     diva = (mersenne - 1) / fa;
     divb = (mersenne) / fb;
 
-    gmp_printf("%15Zd %15Zd %15Zd %15Zd %15Zd %15Zd %15Zd %15Zd\n",
+    gmp_printf("%15Zd %15Zd %15Zd %15Zd %15Zd %15Zd %15Zd\n",
                k.get_mpz_t(), fa.get_mpz_t(), diva.get_mpz_t(), fb.get_mpz_t(),
-               divb.get_mpz_t(), ma.get_mpz_t(), mb.get_mpz_t(),
-               dmab.get_mpz_t());
+               divb.get_mpz_t(), ma.get_mpz_t(), mb.get_mpz_t()/*,
+               dmab.get_mpz_t()*/);
   }
 }
 
 /** Calcula mersenne, lo divide por 2pk+1 y calcula el módulo */
-void analysis2(unsigned to) {
+void analysis2(unsigned int to, unsigned int from) {
   mpz_class mersenne, p, f, k, mod;
   bigHalfGearFactorizer bf;
+  vector<mpz_class> factors;
 
   p = 3;
   printf("p;m;Xp;p:4k+?;k:4k+?\n");
@@ -371,24 +445,46 @@ void analysis2(unsigned to) {
     mersenne--;
     f = (2 * p) + 1;
     mpz_mod(mod.get_mpz_t(), mersenne.get_mpz_t(), f.get_mpz_t());
-    gmp_printf("%'Zd;", p.get_mpz_t());   // p
-    gmp_printf("%'Zd;", mod.get_mpz_t()); // m
-    bf.clear();
-    bf.find((p - 1) / 2);
-    printf("%s;", bf.toString().c_str());
-    if (is4kp1(p)) {
-      printf("4k+1;");
-      k = (p - 1) / 4;
-    } else {
-      printf("4k+3;");
-      k = (p - 3) / 4;
+    // if (mod == from) {
+    if (p % 10 == 7) {
+      gmp_printf("%'Zd;", p.get_mpz_t());   // p
+      gmp_printf("%'Zd;", mod.get_mpz_t()); // m
+      bf.clear();
+      bf.find((p - 1) / 2);
+
+      for (mpz_class f : bf.factors) {
+        if (find(factors.begin(), factors.end(), f) == factors.end()) {
+          factors.push_back(f);
+        }
+      }
+
+      printf("%s;", bf.toString(true).c_str());
+      if (is4kp1(p)) {
+        printf("4k+1;");
+        k = (p - 1) / 4;
+      } else {
+        printf("4k+3;");
+        k = (p - 3) / 4;
+      }
+      bf.clear();
+      bf.find(k);
+      gmp_printf("%s;", bf.toString(true).c_str()); // k
+      printf("\n");
     }
-    bf.clear();
-    bf.find(k);
-    gmp_printf("%s;", bf.toString(true).c_str()); // k
-    printf("\n");
+    //}
     mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
   }
+
+  printf("\n");
+  p = 3;
+  auto max = *max_element(factors.begin(), factors.end());
+  for (int i = 0; i <= max.get_ui(); i++) {
+    if (find(factors.begin(), factors.end(), p) == factors.end()) {
+      gmp_printf("%Zd;\n", p.get_mpz_t());
+    }
+    mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
+  }
+  printf("\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -428,6 +524,12 @@ int main(int argc, char *argv[]) {
                       (char *)"Analysis particular p", (char *)"N"));
   argHdl.add(
       argument(8, (char *)"b", (char *)"B", (char *)"Analysis 2", (char *)"N"));
+
+  argHdl.add(argument(9, (char *)"c", (char *)"c",
+                      (char *)"Analysis only Prime Mersenne numbers",
+                      (char *)"N"));
+  argHdl.add(argument(10, (char *)"l", (char *)"L",
+                      (char *)"Composite mersenne test", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -473,7 +575,17 @@ int main(int argc, char *argv[]) {
 
     case 8:
       // argHdl.pvalue(&p);
-      analysis2(to);
+      analysis2(to, from);
+      break;
+
+    case 9:
+      // argHdl.pvalue(&p);
+      processB();
+      break;
+
+    case 10:
+      argHdl.pvalue(&p);
+      primarityTest2(p);
       break;
     }
   }
