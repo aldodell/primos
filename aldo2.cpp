@@ -343,23 +343,30 @@ void primarityTest2_worker(int &reached, mpz_class omega, mpz_class p2,
                            mpz_class min, mpz_class max
 
 ) {
-
+  mutex locker;
   mpz_class a, b, f;
   a = min;
 
+  locker.lock();
   gmp_printf("Thread min=%Zd begining\n", a.get_mpz_t());
+  locker.unlock();
 
   while (reached == 0 && a < max) {
     b = (omega - a) / (p2 * a + 1);
     f = p2 * a * b + a + b;
     if (f == omega) {
+      locker.lock();
       gmp_printf("Ks: %Zd, %Zd\a\n", a.get_mpz_t(), b.get_mpz_t());
+      locker.unlock();
+
       break;
     }
     a++;
   }
 
+  locker.lock();
   printf("Thread: %d finished.\n", reached);
+  locker.unlock();
   reached++;
 }
 
@@ -390,6 +397,7 @@ void primarityTest2(unsigned int p) {
   while (reached < nThreads) {
   }
   printf("Reached: %d\n", reached);
+  cout.flush();
 }
 
 void analysis(unsigned int p, unsigned int limit) {
@@ -515,16 +523,8 @@ void primarityTest(unsigned int p) {
   mpz_mod_ui(T.get_mpz_t(), mersenne.get_mpz_t(), pow(10, p_digits));
   last_mersenne_digits = T.get_ui();
 
-  while(true) {
-
-
-
+  while (true) {
   }
-
-
-
-
-
 }
 
 int main(int argc, char *argv[]) {
