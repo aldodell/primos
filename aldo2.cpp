@@ -212,6 +212,7 @@ void processRange(int from, int to) {
 }
 
 /** Looking for first k if is a composite number */
+/*
 void lookFirstK(mpz_class p) {
 
   mpz_class mersenne; // Mersenne base number
@@ -244,7 +245,7 @@ void lookFirstK(mpz_class p) {
     gmp_printf("M finish with 1\n");
   }
 
-  /*
+
   if (mpz_divisible_ui_p(Xp.get_mpz_t(), 2) != 0) {
     gmp_printf("p has 2 factor.\n");
     return;
@@ -256,6 +257,7 @@ void lookFirstK(mpz_class p) {
   }
   */
 
+/*
   p2 = 2 * p;
   f = p2 + 1;
   k = 1;
@@ -282,8 +284,10 @@ void lookFirstK(mpz_class p) {
 
   gmp_printf("First k=%Zd, f=%Zd\n", k.get_mpz_t(), f.get_mpz_t());
 }
+*/
 
 /** POR DESARROLLAR */
+/*
 void primarityTest(unsigned int exponent) {
 
   mpz_class k0, k1; // K en los factores de la forma 2pk+1
@@ -333,69 +337,59 @@ void primarityTest(unsigned int exponent) {
 
   //}
 }
+*/
 
-void primarityTest2(unsigned int p) {
-  mpz_class a, b, f, p2, p2p1, q, r;
-  mpz_class mersenne, omega, omegam1;
-  kdProcessBenchmark benchmark;
+void primarityTest2_worker(int &reached, mpz_class omega, mpz_class p2,
+                           mpz_class min, mpz_class max
 
-  bool upDownFlag = true; // up: true, down: falsea
+) {
 
-  p2 = 2 * p;
-  p2p1 = p2 + 1;
-  q = 2;
-  r = 2;
-  mpz_ui_pow_ui(omega.get_mpz_t(), 2, p);
-  omega = (omega - 2) / (2 * p);
-  // omegam1 = omega - 1;
+  mpz_class a, b, f;
+  a = min;
 
-  // First intent:
-  a = 1;
-  b = (omega - a) / (p2 * a + 1);
+  gmp_printf("Thread min=%Zd begining\n", a.get_mpz_t());
 
-  benchmark.cyclesForStep = 1000000;
-  benchmark.start();
-  while (true) {
-    benchmark.tick();
+  while (reached == 0 && a < max) {
+    b = (omega - a) / (p2 * a + 1);
     f = p2 * a * b + a + b;
     if (f == omega) {
       gmp_printf("Ks: %Zd, %Zd\a\n", a.get_mpz_t(), b.get_mpz_t());
-      return;
-    } else if (f < omega) {
-      a = a + q - 1;
-      q *= 2;
-      r = 1;
-      if (!upDownFlag) {
-        upDownFlag = true;
-        b = (omega - a) / (p2 * a + 1);
-      }
-    } else {
-      a = a - r + 1;
-      r *= 2;
-      q = 1;
-      if (upDownFlag) {
-        upDownFlag = false;
-        b = (omega - a) / (p2 * a + 1);
-      }
+      break;
     }
+    a++;
   }
-  benchmark.stop();
 
-  /*
-    while (true) {
-      f = p2 * a * b + a + b;
-      if (f == omega) {
-        gmp_printf("Ks: %Zd, %Zd\n", a.get_mpz_t(), b.get_mpz_t());
-        return;
-      } else if (f < omega) {
-        a += q;
-        q *= 2;
-      } else {
-        a -=
-      }
-      b = (omega - a) / (p2 * a + 1);
-    }
-    */
+  printf("Thread: %d finished.\n", reached);
+  reached++;
+}
+
+void primarityTest2(unsigned int p) {
+  mpz_class p2, top, byThreads;
+  mpz_class mersenne, omega, min, max;
+  kdProcessBenchmark benchmark;
+  vector<thread> threads;
+  unsigned int nThreads = 50;
+  int reached = 0;
+
+  p2 = 2 * p;
+
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
+  mersenne--;
+  omega = (mersenne - 1) / p2;
+  mpz_sqrt(top.get_mpz_t(), mersenne.get_mpz_t());
+  top = top / (p2 + 1);
+  byThreads = top / nThreads;
+
+  for (int i = 0; i < nThreads; i++) {
+    min = (i * byThreads) + 1;
+    max = min + byThreads - 1;
+    threads.emplace_back(
+        thread(primarityTest2_worker, ref(reached), omega, p2, min, max));
+  }
+
+  while (reached < nThreads) {
+  }
+  printf("Reached: %d\n", reached);
 }
 
 void analysis(unsigned int p, unsigned int limit) {
@@ -499,6 +493,40 @@ void analysis2(unsigned int to, unsigned int from) {
   printf("\n");
 }
 
+/** Intent to get a fast primarity test for Mersenne's numbers*/
+
+void primarityTest(unsigned int p) {
+  mpz_class mersenne;           // mersenne number to be evaluate
+  mpz_class T;                  // multipurpose field
+  unsigned int mersenne_digits; // Digits of mersenne number
+  unsigned int p_digits;        // Digits of exponent
+  unsigned int last_mersenne_digits;
+  unsigned int a, b; // Inner factors
+
+  // Calculate mersenne:
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
+  mersenne--;
+
+  // Calculate digits sizes:
+  mersenne_digits = (p * log10(2)) + 1;
+  p_digits = log10(p) + 1;
+
+  // Calculate last mersenne digits:
+  mpz_mod_ui(T.get_mpz_t(), mersenne.get_mpz_t(), pow(10, p_digits));
+  last_mersenne_digits = T.get_ui();
+
+  while(true) {
+
+
+
+  }
+
+
+
+
+
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int exponent, speed;
@@ -514,7 +542,7 @@ int main(int argc, char *argv[]) {
                       (char *)"N"));
 
   argHdl.add(argument(1, (char *)"p", (char *)"exponent",
-                      (char *)"Init process with 2^p-1", (char *)"N"));
+                      (char *)"Set exponent on 2^p-1", (char *)"N"));
 
   argHdl.add(argument(2, (char *)"f", (char *)"from",
                       (char *)"Define p to begin", (char *)"N"));
@@ -526,8 +554,8 @@ int main(int argc, char *argv[]) {
                       (char *)"Init process with 2^p-1 with p0=f & pn=t",
                       (char *)"N"));
 
-  argHdl.add(argument(5, (char *)"k", (char *)"test",
-                      (char *)"Test for a particular p", (char *)"N"));
+  argHdl.add(
+      argument(5, (char *)"k", (char *)"test", (char *)"FREE", (char *)"N"));
 
   argHdl.add(argument(6, (char *)"j", (char *)"J",
                       (char *)"Test for a particular p", (char *)"N"));
@@ -540,6 +568,7 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(9, (char *)"c", (char *)"c",
                       (char *)"Analysis only Prime Mersenne numbers",
                       (char *)"N"));
+
   argHdl.add(argument(10, (char *)"l", (char *)"L",
                       (char *)"Composite mersenne test", (char *)"N"));
 
@@ -554,7 +583,6 @@ int main(int argc, char *argv[]) {
 
     case 1:
       argHdl.pvalue(&p);
-      processA(p, true);
       break;
 
     case 2:
@@ -570,33 +598,25 @@ int main(int argc, char *argv[]) {
       break;
 
     case 5:
-      argHdl.pvalue(&p);
-      exp = (unsigned int)p;
-      lookFirstK(exp);
       break;
 
     case 6:
-      argHdl.pvalue(&p);
       primarityTest(p);
       break;
 
     case 7:
-      argHdl.pvalue(&p);
       analysis(p, to);
       break;
 
     case 8:
-      // argHdl.pvalue(&p);
       analysis2(to, from);
       break;
 
     case 9:
-      // argHdl.pvalue(&p);
       processB();
       break;
 
     case 10:
-      argHdl.pvalue(&p);
       primarityTest2(p);
       break;
     }

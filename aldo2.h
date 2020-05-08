@@ -10,6 +10,7 @@
 #include "primeTester.h"
 #include "string"
 #include <gmpxx.h>
+#include <thread>
 
 vector<unsigned int> mersenneExponents{
     2,        3,        5,        7,        13,       17,       19,
