@@ -506,22 +506,27 @@ void analysis2(unsigned int to, unsigned int from) {
 void primarityTest(unsigned int p) {
   mpz_class mersenne;           // mersenne number to be evaluate
   mpz_class T;                  // multipurpose field
+  mpz_class carry_a, carry_b;   // carry factor
   unsigned int mersenne_digits; // Digits of mersenne number
   unsigned int p_digits;        // Digits of exponent
   unsigned int last_mersenne_digits;
   unsigned int a, b; // Inner factors
+
+  unsigned int p2 = 2*p;  //Exponent * 2
 
   // Calculate mersenne:
   mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
   mersenne--;
 
   // Calculate digits sizes:
-  mersenne_digits = (p * log10(2)) + 1;
+  mersenne_digits = mpz_sizeinbase(mersenne.get_mpz_t(),10);
   p_digits = log10(p) + 1;
 
   // Calculate last mersenne digits:
   mpz_mod_ui(T.get_mpz_t(), mersenne.get_mpz_t(), pow(10, p_digits));
   last_mersenne_digits = T.get_ui();
+
+  
 
   while (true) {
   }
