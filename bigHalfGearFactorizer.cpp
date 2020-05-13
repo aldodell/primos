@@ -101,6 +101,7 @@ void bigHalfGearFactorizer::find(mpz_class n) {
       if (mpz_divisible_p(n.get_mpz_t(), pivot.get_mpz_t()) != 0) {
         mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
         this->factors.push_back(pivot);
+        gmp_printf("%Zd\n", pivot.get_mpz_t());
       }
     }
   }
@@ -124,6 +125,7 @@ void bigHalfGearFactorizer::find(mpz_class n) {
       mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
       mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
       this->factors.push_back(pivot);
+      gmp_printf("%Zd\n", pivot.get_mpz_t());
 
       if (pivot.get_str().length() > PRESIEVED_DIGITS) {
         // if doesn't exists save it
@@ -298,6 +300,7 @@ void bigHalfGearFactorizer::findMersenne(mpz_class p) {
     if (mpz_divisible_p(mersenne.get_mpz_t(), k.get_mpz_t()) != 0) {
       this->factors.push_back(k); // Lo pasamos como factor
       gmp_printf("%Zd\n", k.get_mpz_t());
+      cout.flush();
 
       // Evaluamos si tenemos el número en la base de datos. Sino lo incluímos
       if (k.get_str().length() > PRESIEVED_DIGITS) {

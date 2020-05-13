@@ -9,44 +9,60 @@
 /**
  * Área de pruebas de operaciones cíclicas
  * */
+void myTest(int p, int cycles);
 
-void test(int cycles) {
+void myTest(int p, int cycles) {
+
   kdProcessBenchmark benchmarker;
   benchmarker.cyclesForStep = cycles;
 
   /** Test fields */
 
-  mpz_class m, n, k, p, p2;
-  unsigned int md; // digitos de mersenne
-  unsigned int fd; // digitos del factor
-
-  p = 332192857;
+  mpz_class m, a, b, z0, z1, omega;
+  int n;
+  unsigned int p2;
   p2 = 2 * p;
-  md = log10(2) * p.get_ui() + 1;
 
-  mpz_ui_pow_ui(m.get_mpz_t(), 2, p.get_ui());
+  mpz_ui_pow_ui(m.get_mpz_t(), 2, p);
   m--;
-  k = 1000;
+  a = 1;
+
+  omega = (m - 1) / (p2);
 
   benchmarker.start();
+  //  z0 = omega - 1;
+  // z1 = p2 + 1;
+  z1 = 1000000000;
   while (benchmarker.tick()) {
-    /**       Coloque código de prueba aqui */
- 
-f = log10(p2.get_ui()) * k + 1;
 
+    mpz_mod(z0.get_mpz_t(), m.get_mpz_t(), z1.get_mpz_t());
 
+    /*
+       n = mpz_divisible_p(z0.get_mpz_t(), z1.get_mpz_t());
+       if (n != 0) {
+         gmp_printf("f0=%Zd\n", z1.get_mpz_t());
+         break;
+       }
+       z0--;
+       z1 += p2;
+       */
     /** fin de Area de prueba */
   }
   benchmarker.stop();
+  gmp_printf("f0=%Zd\n", z0.get_mpz_t());
 }
 
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
   int debugLevel;
   int action;
-  int cycles;
+  int cycles = 0;
+  int p = 1;
 
   argHdl.add(argument(0, (char *)"n", (char *)"N", (char *)"Cycles to test",
+                      (char *)"N"));
+
+  argHdl.add(argument(1, (char *)"p", (char *)"P", (char *)"Cycles to test",
                       (char *)"N"));
 
   while (action > -1) {
@@ -54,10 +70,12 @@ int main(int argc, char *argv[]) {
     switch (action) {
     case 0:
       argHdl.pvalue(&cycles);
-      test(cycles);
       break;
+    case 1:
+      argHdl.pvalue(&p);
     }
   }
 
+  myTest(p, cycles);
   exit(0);
 }

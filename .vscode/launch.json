@@ -26,15 +26,13 @@
             "request": "launch",
             "program": "${workspaceRoot}/pruebas.out",
             "args": [
-                "-f:primos-temp.bin",
-                "-t:120",
-                "-p",
-                "-n:100"
+                "-n:1000000000",
+                "-p:11"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "lldb"
         },
         {
@@ -185,6 +183,17 @@
             "args": [
                 "-d:100",
                 "-m:11"
+            ]
+        },
+        {
+            "name": "oni",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/oni.out",
+            "args": [
+                "-a:40",
+                "-p"
             ]
         }
     ]

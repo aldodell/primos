@@ -143,7 +143,7 @@ bool kdProcessBenchmark::tick() {
 void kdProcessBenchmark::stop() {
   size_t tmp = clock();
   double t = (double)(tmp - this->tIni) / CLOCKS_PER_SEC;
-  printf("\nTotal process time: %f seconds.\n", t);
+  printf("Total process time: %f seconds.\n", t);
 }
 
 std::string string_join(const std::vector<std::string> &elements,

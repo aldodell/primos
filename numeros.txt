@@ -7,3 +7,8 @@ b    0                               1                               0          
  fileIndex = number / SPG_FILE_SIZE;
     block = (number - (fileIndex * SPG_FILE_SIZE)) / 20;
     flag = (number - (fileIndex * SPG_FILE_SIZE) - (20 * block));
+
+    Pongo un ejemplo. Supongamos que tengo una sucesión cuyo valor es 40. Y sé además que esa sucesión termina en 41. ¿Cuál debe ser el valor inicial? Si no fuera posible un valor exacto no importa, puede ser un valor igual o menor (por poco) a un impar que inicie la sucesión.
+En este caso por ejemplo, el intervalo (15,41) me da como valor 392. Pero para el fin que persigo de optimización del algoritmo, es aceptable. Luego meto estos valores en un bucle que va aproximando más. La idea es eliminar miles (o miles de millones) de ciclos de bucle al iniciar cada cómputo.
+Necesito disminuir lo más posible el tanteo Eso hace más rápido los cálculos.
+Hasta ahora la implementación de su teoría es bastante sólida para el cálculo de números primos. Lo que estoy buscando es hacer que los cálculos se hagan en un tiempo polinomial o casi... es decir, que sea lo más rápido posible.
