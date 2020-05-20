@@ -15,7 +15,7 @@ mpz_class oni_sum(mpz_class a, mpz_class b) {
 
 void oni_primarity(mpz_class z) {
   kdProcessBenchmark benckmark;
-  mpz_class a, b, q, r, s, d, t;
+  mpz_class a, b, q, r, s;
   a = 3;
   b = 2 * z - 1;
   q = z * z;
@@ -32,34 +32,19 @@ void oni_primarity(mpz_class z) {
 
   while (true) {
     benckmark.tick();
-
     gmp_printf("%Zd\t%Zd\t%Zd\n", a.get_mpz_t(), b.get_mpz_t(), r.get_mpz_t());
-
     if (r == q) {
       gmp_printf("%Zd isn't prime. a=%Zd, b=%Zd.\n", z.get_mpz_t(),
                  a.get_mpz_t(), b.get_mpz_t());
       break;
-    } else if (r > q) {
+    }
 
-      // 1+sqrt(b^2+2*b-4*i+1)
+    while (r > q) {
+      r -= a;
+      a += 2;
+    }
 
-      if (r - q > 4) {
-        mpz_pow_ui(t.get_mpz_t(), b.get_mpz_t(), 2);
-        t = t + (2 * b) - (4 * q) + 1;
-        mpz_sqrt(t.get_mpz_t(), t.get_mpz_t());
-        t++;
-        if (mpz_tstbit(t.get_mpz_t(), 0) == 0) {
-          t--;
-        }
-        d = ((t + a) / 2) * (((t - a) / 2) + 1);
-        r -= d;
-        a = t + 2;
-      } else {
-        r -= a;
-        a += 2;
-      }
-    } else if (r < q) {
-
+    while (r < q) {
       b += 2;
       r += b;
     }
@@ -73,33 +58,63 @@ void oni_primarity(mpz_class z) {
   benckmark.stop();
 }
 
-//  gmp_printf("%Zd isn't prime. a=%Zd, b=%Zd\n", z.get_mpz_t(),
-// a.get_mpz_t(), b.get_mpz_t());
-
-// gmp_printf("%Zd is prime\n", z.get_mpz_t());
-
-void oni_test1() {
+void oni_test1(unsigned int a, unsigned int b) {
 
   unsigned int p;
   unsigned int i;
   unsigned int j;
+  bigHalfGearFactorizer bf;
+  mpz_class q = 2;
 
-  mpz_class lt, m;
+  mpz_class lt, m, n, f, g;
   string s[]{"no primo", "probablemente primo", "primo"};
 
-  // gmp_printf("p;lt;prime\n");
-  for (i = 0; i < 30; i++) {
+  gmp_printf("p;lt;prime\n");
+  for (i = a; i < b; i++) {
     p = mersenneExponents[i];
+    // mpz_nextprime(q.get_mpz_t(), q.get_mpz_t());
     mpz_ui_pow_ui(m.get_mpz_t(), 2, p);
     m--;
     lt = 2 * m - 1;
     j = mpz_probab_prime_p(lt.get_mpz_t(), 15);
-    // gmp_printf("*2^%d-1*=%Zd.\n*2M-1*=%Zd.\n*%s.*\n\n", p, m.get_mpz_t(),
-    // lt.get_mpz_t(),
-    //          s[j].c_str());
+    bf.clear();
+    bf.find(lt);
+    gmp_printf("2^%d-1;2M-1 *%s*;%s.", p, s[j].c_str(),
+               bf.toString(true).c_str());
 
-    gmp_printf("*2^%d-1*. 2M-1 *%s*.\n", p, s[j].c_str());
-    //cin.ignore();
+    sort(bf.factors.begin(), bf.factors.end());
+    for (int i = 0; i < bf.factors.size(); i++) {
+      f = bf.factors[i];
+      mpz_mod_ui(n.get_mpz_t(), f.get_mpz_t(), 22);
+      g = f / 22;
+      gmp_printf("\n\t%Zd=2*11*%Zd+%Zd ", f.get_mpz_t(), g.get_mpz_t(),
+                 n.get_mpz_t());
+    }
+    printf("\n");
+  }
+}
+
+/** Este test busca los números de Mersenne con p terminados en 7 y prueba
+ * si 2M-1 es divisibles por 11
+ * */
+void oni_test2(int a, int b) {
+  int i;
+  int p;
+  mpz_class m;
+  for (i = 0; i < 51; i++) {
+    p = mersenneExponents[i];
+
+    if (p % 10 == a) {
+      mpz_ui_pow_ui(m.get_mpz_t(), 2, p);
+      m--;
+      m = 2 * m - 1;
+
+      if (mpz_divisible_ui_p(m.get_mpz_t(), b) != 0) {
+        printf("2*(2^%d-1)-1 es divisible por %d.\n", p, b);
+      } else {
+        printf("2*(2^%d-1)-1 NO es divisible por %d.\n", p, b);
+      }
+    }
   }
 }
 
@@ -129,6 +144,10 @@ int main(int argc, char *argv[]) {
                       (char *)"Take last term o ONI on Mersenne N",
                       (char *)"N"));
 
+  argHdl.add(argument(6, (char *)"f", (char *)"experiment2",
+                      (char *)"P ends at 7 are 2M-1 divisible by 11",
+                      (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
 
@@ -155,7 +174,11 @@ int main(int argc, char *argv[]) {
       break;
 
     case 5:
-      oni_test1();
+      oni_test1(a.get_ui(), b.get_ui());
+      break;
+
+    case 6:
+      oni_test2(a.get_ui(), b.get_ui());
       break;
     }
   }

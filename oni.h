@@ -26,5 +26,6 @@ vector<unsigned int> mersenneExponents{
 /* Return basic ONI operation. Adding odd numbers from a to b inclusive*/
 mpz_class oni_sum(mpz_class a, mpz_class b);
 void oni_primarity(mpz_class z);
+void oni_test1(unsigned int a=0, unsigned int b=10);
 
 #endif

@@ -158,8 +158,8 @@
             "terminal": "console",
             "program": "${workspaceRoot}/aldo2.out",
             "args": [
-                "-p:82589933",
-                "-j",
+                "-p:11",
+                "-m",
                 "-d:10"
             ]
         },
@@ -192,8 +192,9 @@
             "terminal": "console",
             "program": "${workspaceRoot}/oni.out",
             "args": [
-                "-a:40",
-                "-p"
+                "-a:0",
+                "-b:11",
+                "-e"
             ]
         }
     ]

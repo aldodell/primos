@@ -1,10 +1,10 @@
-*2^2-1*. 2M-1 *primo*.
-*2^3-1*. 2M-1 *primo*.
-*2^5-1*. 2M-1 *primo*.
+*2^2-1*. 2M-1 *primo*. 5
+*2^3-1*. 2M-1 *primo*. 13
+*2^5-1*. 2M-1 *primo*. 61
 *2^7-1*. 2M-1 *no primo*.
-*2^13-1*. 2M-1 *primo*.
+*2^13-1*. 2M-1 *primo*.  16381
 *2^17-1*. 2M-1 *no primo*.
-*2^19-1*. 2M-1 *probablemente primo*.
+*2^19-1*. 2M-1 *probablemente primo*. 1048573
 *2^31-1*. 2M-1 *no primo*.
 *2^61-1*. 2M-1 *no primo*.
 *2^89-1*. 2M-1 *no primo*.
@@ -28,3 +28,5 @@
 *2^86243-1*. 2M-1 *no primo*.
 *2^110503-1*. 2M-1 *no primo*.
 *2^132049-1*. 2M-1 *no primo*.
+
+

@@ -101,7 +101,9 @@ void bigHalfGearFactorizer::find(mpz_class n) {
       if (mpz_divisible_p(n.get_mpz_t(), pivot.get_mpz_t()) != 0) {
         mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
         this->factors.push_back(pivot);
-        gmp_printf("%Zd\n", pivot.get_mpz_t());
+        if (this->debug > 0) {
+          gmp_printf("%Zd\n", pivot.get_mpz_t());
+        }
       }
     }
   }
@@ -125,7 +127,9 @@ void bigHalfGearFactorizer::find(mpz_class n) {
       mpz_divexact(n.get_mpz_t(), n.get_mpz_t(), pivot.get_mpz_t());
       mpz_sqrt(root.get_mpz_t(), n.get_mpz_t());
       this->factors.push_back(pivot);
-      gmp_printf("%Zd\n", pivot.get_mpz_t());
+      if (this->debug > 0) {
+        gmp_printf("%Zd\n", pivot.get_mpz_t());
+      }
 
       if (pivot.get_str().length() > PRESIEVED_DIGITS) {
         // if doesn't exists save it
@@ -370,6 +374,7 @@ int main(int argc, char *argv[]) {
       break;
     case 1:
       argHdl.pvalue(&debugLevel);
+      gf.debug = debugLevel;
       break;
     case 2:
       n = argHdl.value;

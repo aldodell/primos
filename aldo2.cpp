@@ -352,13 +352,16 @@ void primarityTest2_worker(int &reached, mpz_class omega, mpz_class p2,
   locker.unlock();
 
   while (reached == 0 && a < max) {
-    b = (omega - a) / (p2 * a + 1);
-    f = p2 * a * b + a + b;
-    if (f == omega) {
+    //    b = (omega - a) / (p2 * a + 1);
+    // f = p2 * a * b + a + b;
+
+    b = (omega - a) % (p2 * a + 1);
+
+    //   if (f == omega) {
+    if (b == 0) {
       locker.lock();
       gmp_printf("Ks: %Zd, %Zd\a\n", a.get_mpz_t(), b.get_mpz_t());
       locker.unlock();
-
       break;
     }
     a++;
@@ -375,7 +378,7 @@ void primarityTest2(unsigned int p) {
   mpz_class mersenne, omega, min, max;
   kdProcessBenchmark benchmark;
   vector<thread> threads;
-  unsigned int nThreads = 50;
+  unsigned int nThreads = 5;
   int reached = 0;
 
   p2 = 2 * p;
@@ -503,35 +506,105 @@ void analysis2(unsigned int to, unsigned int from) {
 
 /** Intent to get a fast primarity test for Mersenne's numbers*/
 
-void primarityTest(unsigned int p) {
-  mpz_class mersenne;         // mersenne number to be evaluate
-  mpz_class T;                // multipurpose field
-  mpz_class carry_a, carry_b; // carry factor
-  mpz_class a, b;             // inner factors
+int primarityTest(unsigned int p) {
+  mpz_class mersenne; // mersenne number to be evaluate
+  mpz_class t;        // multipurpose field
+  mpz_class a, b;     // inner factors
   mpz_class omega;
-  unsigned int mersenne_digits; // Digits of mersenne number
-  unsigned int p_digits;        // Digits of exponent
-  unsigned int last_mersenne_digits;
-  unsigned int fa, fb; // factors
+  mpz_class fa, fb; // factors
+  mpz_class root;   // root
 
+  unsigned int mersenne_length;     // Digits of mersenne number
+  unsigned int p_length;            // Digits of exponent
+  unsigned int last_mersenne_digit; //
+  unsigned int fa_length;
+  unsigned int fb_length; // length of factor b
+  unsigned int za, zb;    // correlative pointer to
+
+  unsigned int border0 = 10000;
   unsigned int p2 = 2 * p; // Exponent * 2
+  mpz_class sa[6], sb[6];
+  unsigned int sc[6];
 
   // Calculate mersenne:
   mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
   mersenne--;
+  mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+
+  // Calculate omega
+  omega = (mersenne - 1) / (2 * p);
 
   // Calculate digits sizes:
-  mersenne_digits = mpz_sizeinbase(mersenne.get_mpz_t(), 10);
-  p_digits = log10(p) + 1;
+  mersenne_length = mpz_sizeinbase(mersenne.get_mpz_t(), 10);
+  p_length = log10(p) + 1;
 
   // Calculate last mersenne digits:
-  mpz_mod_ui(T.get_mpz_t(), mersenne.get_mpz_t(), pow(10, p_digits));
-  last_mersenne_digits = T.get_ui();
+  mpz_mod_ui(t.get_mpz_t(), mersenne.get_mpz_t(), 10);
+  last_mersenne_digit = t.get_ui();
 
+  // Calculate a and b, trying
   a = 1;
   b = (omega - a) / (p2 * a + 1);
 
+  // Factor a:
+  fa = p2 + 1;
+
+  // factor b
+  fb = p2 * b + 1;
+
+  // Last digits secuence
+  sa[1] = (1 * p2 + 1) % 10;
+  sa[2] = (2 * p2 + 1) % 10;
+  sa[3] = (3 * p2 + 1) % 10;
+  sa[4] = (4 * p2 + 1) % 10;
+  sa[5] = (5 * p2 + 1) % 10;
+
+  sb[1] = (b * p2 + 1) % 10;
+  sb[2] = ((b - 1) * p2 + 1) % 10;
+  sb[3] = ((b - 2) * p2 + 1) % 10;
+  sb[4] = ((b - 3) * p2 + 1) % 10;
+  sb[5] = ((b - 4) * p2 + 1) % 10;
+
+  if (last_mersenne_digit == 1) {
+    for (int i = 1; i <= 5; i++) {
+      if ((sa[i] == 1 && sb[i] == 1) || (sa[i] == 3 && sb[i] == 7) ||
+          (sa[i] == 7 && sb[i] == 3) || (sa[i] == 9 && sb[i] == 9)) {
+        sc[i] = 1;
+      } else {
+        sc[i] = 0;
+      }
+    }
+  }
+
+  if (last_mersenne_digit == 7) {
+    for (int i = 1; i <= 5; i++) {
+      if ((sa[i] == 1 && sb[i] == 7) || (sa[i] == 7 && sb[i] == 1) ||
+          (sa[i] == 3 && sb[i] == 9) || (sa[i] == 9 && sb[i] == 3)) {
+        sc[i] = 1;
+      } else {
+        sc[i] = 0;
+      }
+    }
+  }
+
+  // Get sequencer
+  za = 1;
   while (true) {
+    if (sc[za] == 1) {
+      if (mpz_divisible_p(mersenne.get_mpz_t(), fa.get_mpz_t()) == 0) {
+        printf("Isn't prime.");
+        return -1;
+      }
+    }
+    za++;
+    if (za == 6) {
+      za = 1;
+    }
+    fa += p2;
+    if (fa > root) {
+      printf("Prime\n.");
+      return 1;
+    }
   }
 }
 
@@ -580,6 +653,9 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(10, (char *)"l", (char *)"L",
                       (char *)"Composite mersenne test", (char *)"N"));
 
+  argHdl.add(argument(11, (char *)"m", (char *)"M", (char *)"Primarity test",
+                      (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
 
@@ -626,6 +702,10 @@ int main(int argc, char *argv[]) {
 
     case 10:
       primarityTest2(p);
+      break;
+
+    case 11:
+      primarityTest(p);
       break;
     }
   }
