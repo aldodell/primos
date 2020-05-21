@@ -644,9 +644,33 @@ int primarityTest(unsigned int p, unsigned int presieving) {
 
   st.resize(index0, 1);
 
+  for (i = 0; i < primes.size(); i++) {
+    vector<unsigned int> data;
+    t = p2 + 1;
+    for (j = 0; j < primes[i]; j++) {
+      if (mpz_divisible_ui_p(t.get_mpz_t(), primes[i]) != 0) {
+        data.push_back(0);
+      } else {
+        data.push_back(1);
+      }
+      t += p2;
+    }
+    sieve.push_back(data);
+  }
+
   gmp_printf("Making pre sieve table. \n");
 
+  for (i = 0; i < index0; i++) {
+    for (j = 0; j < sieve.size(); j++) {
+      if (sieve[j][i % primes[j]] == 0) {
+        st[i] = 0;
+        break;
+      }
+    }
+  }
+
   // Make table
+  /*
   k = 0;
   t = 2 * p + 1;
   primesSize = primes.size();
@@ -662,6 +686,7 @@ int primarityTest(unsigned int p, unsigned int presieving) {
     }
     t += p2;
   }
+  */
 
   f = (float)k / (float)index0;
   printf("Ratio: %f.\n", f);

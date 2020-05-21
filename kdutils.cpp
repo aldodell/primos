@@ -168,3 +168,69 @@ template <typename T> bool ifExists(vector<T> &vect, T &elem) {
 }
 
 string yesOrNot(bool booleanValue) { return booleanValue ? "yes" : "no"; }
+
+kdPocketBit::kdPocketBit(size_t size) { this->data.reserve(size / 8); }
+
+void kdPocketBit::set(int64 position, bool status) {
+  int64 p = position / 8;
+  int o = position - (8 * p);
+  unsigned char b = this->data[p];
+  b |= (1 << o);
+  this->data[p] = b;
+}
+
+bool kdPocketBit::get(int64 position) {
+  bool r;
+  int64 p = position / 8;
+  int o = position - (8 * p);
+  unsigned char b = this->data[p];
+  r = (b >> o) & 1UL;
+
+  if (r == 1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void kdPocketBit::write(bool status) {
+  if (status) {
+    this->byte |= 1UL << this->offest; // Set bit
+  } else {
+    this->byte &= ~(1UL << this->offest); // Clear bit
+  }
+
+  this->offest++;
+  if (this->offest == 8) {
+    this->data[this->index] = this->byte;
+    this->offest = 0;
+    this->index++;
+  }
+}
+
+bool kdPocketBit::read() {
+
+  char unsigned r;
+  bool rr;
+  r = (this->byte >> this->offest) & 1UL; // Get
+  if (r == 1) {
+    rr = true;
+  } else {
+    rr = false;
+  }
+  this->offest++;
+
+  if (this->offest == 8) {
+    this->offest = 0;
+    this->index++;
+    this->byte = this->data[this->index];
+  }
+
+  return rr;
+}
+
+void kdPocketBit::reset() {
+  this->index = 0;
+  this->offest = 0;
+  this->byte = this->data[this->index];
+}

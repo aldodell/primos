@@ -159,7 +159,7 @@
             "program": "${workspaceRoot}/aldo2.out",
             "args": [
                 "-p:29",
-                "-t:11",
+                "-t:23",
                 "-m",
                 "-d:10"
             ]

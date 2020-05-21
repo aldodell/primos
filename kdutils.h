@@ -6,10 +6,10 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <locale>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <locale>
 
 #define CALL_MEMBER_FN(object, ptrToMember) ((object).*(ptrToMember))
 
@@ -62,6 +62,22 @@ public:
 
 private:
   size_t tIni, tSnap, tEnd;
+};
+
+class kdPocketBit {
+public:
+  kdPocketBit(size_t size);
+  void set(int64 position, bool status);
+  bool get(int64 position);
+  vector<unsigned char> data;
+  void reset();
+  void write(bool status);
+  bool read();
+
+private:
+  int64 index;
+  unsigned int offest;
+  unsigned int byte;
 };
 
 std::string string_join(const std::vector<std::string> &elements,
