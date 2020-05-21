@@ -1,0 +1,12 @@
+define z(n) {
+local i,j,k;
+j=2;
+k=0;
+for(i=0; i<n; i++) {
+    j = nextprime(j);
+    k += (1/j);
+    printf("%d %f\n",j,k);
+
+}
+return 1-k;
+}

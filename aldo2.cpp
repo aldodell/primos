@@ -505,7 +505,7 @@ void analysis2(unsigned int to, unsigned int from) {
 }
 
 /** Intent to get a fast primarity test for Mersenne's numbers*/
-
+/*
 int primarityTest(unsigned int p) {
   mpz_class mersenne; // mersenne number to be evaluate
   mpz_class t;        // multipurpose field
@@ -607,6 +607,89 @@ int primarityTest(unsigned int p) {
     }
   }
 }
+*/
+
+int primarityTest(unsigned int p, unsigned int presieving) {
+
+  mpz_class mersenne;
+  mpz_class omega;
+  mpz_class a, b, t, d;
+  unsigned int index0 = 1;
+  vector<unsigned int> st(index0, 1);
+  vector<unsigned int> primes;
+  vector<vector<unsigned int>> sieve;
+  unsigned int i;
+  unsigned int j;
+  unsigned int k;
+  float f;
+  unsigned int p2;
+  size_t primesSize;
+
+  p2 = 2 * p;
+
+  // Get Mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
+  mersenne--;
+
+  // Get omega:
+  omega = (mersenne - 1) / (2 * p);
+
+  // Get prime initial secuence
+  t = 2;
+  while (t.get_ui() <= presieving) {
+    mpz_nextprime(t.get_mpz_t(), t.get_mpz_t());
+    primes.push_back(t.get_ui());
+    index0 *= t.get_ui();
+  }
+
+  st.resize(index0, 1);
+
+  gmp_printf("Making pre sieve table. \n");
+
+  // Make table
+  k = 0;
+  t = 2 * p + 1;
+  primesSize = primes.size();
+  for (i = 0; i < index0; i++) {
+    j = 0;
+    while (j < primesSize) {
+      if (mpz_divisible_ui_p(t.get_mpz_t(), primes[j]) != 0) {
+        st[i] = 0;
+        k++;
+        break;
+      }
+      j++;
+    }
+    t += p2;
+  }
+
+  f = (float)k / (float)index0;
+  printf("Ratio: %f.\n", f);
+
+  gmp_printf("Starting process. \n");
+
+  i = 0;
+  t = p2 + 1;
+  b = omega - 1;
+  while (true) {
+    if (st[i] == 1) {
+      if (mpz_divisible_p(b.get_mpz_t(), t.get_mpz_t()) != 0) {
+        a = (t - 1) / p2;
+        gmp_printf("%Zd, %Zd\n ", a.get_mpz_t(), t.get_mpz_t());
+        break;
+      }
+    }
+    b--;
+    i++;
+    t += p2;
+    if (i == index0) {
+      i = 0;
+      a = (t - 1) / p2;
+      gmp_printf("k=%Zd, t=%Zd.\n", a.get_mpz_t(), t.get_mpz_t());
+    }
+  }
+  return 1;
+}
 
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
@@ -705,7 +788,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 11:
-      primarityTest(p);
+      primarityTest(p, to);
       break;
     }
   }

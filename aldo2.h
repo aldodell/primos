@@ -28,7 +28,7 @@ void processB(int exp, bool putHeader);
 void processRange(int from, int to);
 void lookFirstK(mpz_class p);
 bool isMersenneKnowPrimeExponent(mpz_class p);
-int primarityTest(unsigned int exponent);
+int primarityTest(unsigned int exponent, unsigned int presieving = 13);
 void primarityTest2(unsigned int p);
 void analysis(unsigned int p, unsigned int limit = 0);
 void analysis2(unsigned int to = 1000, unsigned int from = 0);
