@@ -609,8 +609,9 @@ int primarityTest(unsigned int p) {
 }
 */
 
-primeHolder::primeHolder(unsigned int mersenneExponent, unsigned int n) {
+primeHolder::primeHolder(unsigned int theMersenneExponent, unsigned int n) {
 
+  unsigned int mersenneExponent = theMersenneExponent;
   unsigned int p2 = 2 * mersenneExponent;
   unsigned int t;
   this->index = 1;
@@ -625,7 +626,12 @@ primeHolder::primeHolder(unsigned int mersenneExponent, unsigned int n) {
   }
 }
 
-void primeHolder::reset() { this->index = 1; }
+void primeHolder::reset(mpz_class kInitial) {
+  mpz_class t;
+  t = 2 * this->mersenneExponent * kInitial + 1;
+  mpz_mod_ui(t.get_mpz_t(), t.get_mpz_t(), this->mersenneExponent);
+  this->index = t.get_ui();
+}
 
 bool primeHolder::next() {
   bool r = (this->index != this->key); // Return true if a coprime number
@@ -651,9 +657,9 @@ primeSieve::primeSieve(unsigned int mersenneExponent, unsigned int upTo) {
   this->primorial /= 2;
 }
 
-void primeSieve::reset() {
+void primeSieve::reset(mpz_class kInitial) {
   for (int i = 0; i < this->holders.size(); i++) {
-    this->holders[i].reset();
+    this->holders[i].reset(kInitial);
   }
 }
 
@@ -797,8 +803,9 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
   mpz_class mersenne;
   mpz_class omega;
   mpz_class root;
-  mpz_class byThread;
-  mpz_class min, max, kmax;
+  mpz_class kByThread;
+  mpz_class min, max, kMax;
+  mpz_class a, b;
   int reached = 0;
   int threadn = 0;
   vector<thread> threads;
@@ -813,13 +820,13 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
 
   // Get square root
   mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
-  kmax = root / (2 * p);
-  byThread = kmax / nThreads;
+  kMax = (root - 1) / (2 * p);
+  kByThread = kMax / nThreads;
 
   for (int i = 0; i < nThreads; i++) {
-    min = (i * byThread) + 1;
+    min = (i * kByThread) + 1;
     threads.emplace_back(thread(primarityTest_worker, ref(threadn),
-                                ref(reached), p, presieving, min, byThread,
+                                ref(reached), p, presieving, min, kByThread,
                                 mersenne, omega, root));
   }
 

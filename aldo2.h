@@ -28,8 +28,8 @@ void processB(int exp, bool putHeader);
 void processRange(int from, int to);
 void lookFirstK(mpz_class p);
 bool isMersenneKnowPrimeExponent(mpz_class p);
-int primarityTest(unsigned int exponent, unsigned int presieving = 13, int nThreads=1,
-                  int debug = 0);
+int primarityTest(unsigned int exponent, unsigned int presieving = 13,
+                  int nThreads = 1, int debug = 0);
 void primarityTest2(unsigned int p);
 void analysis(unsigned int p, unsigned int limit = 0);
 void analysis2(unsigned int to = 1000, unsigned int from = 0);
@@ -39,11 +39,12 @@ bool is4kp1(mpz_class n);
 
 class primeHolder {
 public:
-  primeHolder(unsigned int mersenneExponent, unsigned int n);
+  primeHolder(unsigned int theMersenneExponent, unsigned int n);
+  unsigned int mersenneExponent;
   unsigned int key;   // number with mod == 0
   unsigned int prime; // number to be evaluated.
   unsigned int prime1;
-  void reset();
+  void reset(mpz_class initial = 1);
   bool next();
   unsigned int index;
 };
@@ -52,7 +53,7 @@ class primeSieve {
 public:
   vector<primeHolder> holders;
   primeSieve(unsigned int mersenneExponent, unsigned int upTo);
-  void reset();
+  void reset(mpz_class initial = 1);
   bool next();
   float ratio();
   mpz_class primorial;
