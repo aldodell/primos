@@ -610,10 +610,10 @@ int primarityTest(unsigned int p) {
 */
 
 primeHolder::primeHolder(unsigned int theMersenneExponent, unsigned int n) {
-
-  unsigned int mersenneExponent = theMersenneExponent;
-  unsigned int p2 = 2 * mersenneExponent;
+  unsigned int p2 = 2 * theMersenneExponent;
   unsigned int t;
+
+  this->mersenneExponent = theMersenneExponent;
   this->index = 1;
   this->prime = n;
   this->prime1 = n + 1;
@@ -628,9 +628,11 @@ primeHolder::primeHolder(unsigned int theMersenneExponent, unsigned int n) {
 
 void primeHolder::reset(mpz_class kInitial) {
   mpz_class t;
-  t = 2 * this->mersenneExponent * kInitial + 1;
-  mpz_mod_ui(t.get_mpz_t(), t.get_mpz_t(), this->mersenneExponent);
-  this->index = t.get_ui();
+  mpz_mod_ui(t.get_mpz_t(), kInitial.get_mpz_t(), this->prime);
+  this->index = 1;
+  for (int n = 1; n < t.get_ui(); n++) {
+    this->next();
+  }
 }
 
 bool primeHolder::next() {
@@ -645,13 +647,10 @@ bool primeHolder::next() {
 primeSieve::primeSieve(unsigned int mersenneExponent, unsigned int upTo) {
   mpz_class t;
   t = 3;
-  while (true) {
+  while (t.get_ui() <= upTo) {
     primeHolder ph(mersenneExponent, t.get_ui());
     this->holders.push_back(ph);
     mpz_nextprime(t.get_mpz_t(), t.get_mpz_t());
-    if (t.get_ui() > upTo) {
-      break;
-    }
   }
   mpz_primorial_ui(this->primorial.get_mpz_t(), upTo);
   this->primorial /= 2;
@@ -755,25 +754,45 @@ int primarityTest_3(unsigned int p, unsigned int presieving, int debug) {
   return 1;
 }
 
+/*
 void primarityTest_worker(int &threadn, int &reached, unsigned int p,
                           unsigned int presieve, mpz_class min,
                           mpz_class byThread, mpz_class mersenne,
                           mpz_class omega, mpz_class root) {
+                            */
 
-  /*
-  void primarityTest_worker(int &threadn, int &reached, unsigned int presieve,
-                            unsigned int p2, mpz_class w, mpz_class q) {
-                              */
+/*
+void primarityTest_worker(int &threadn, int &reached, unsigned int presieve,
+                          unsigned int p2, mpz_class w, mpz_class q) {
+                            */
+
+static mutex sync_printf_mutex;
+int sync_printf(const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  sync_printf_mutex.lock();
+  gmp_vprintf(format, args);
+  sync_printf_mutex.unlock();
+  va_end(args);
+  return 0;
+}
+
+void primarityTest_worker(int &threadn, int &reached, unsigned int p,
+                          unsigned int presieve, mpz_class min, mpz_class max,
+                          mpz_class omega, mpz_class root) {
+  int ID = threadn++;
+
+  sync_printf("Init: %d. min=%Zd\n", ID, min.get_mpz_t());
 
   primeSieve sieve(p, presieve);
-  mpz_class q, w, r;
-  mpz_class myByThread = byThread + 1;
+  mpz_class q, w, r, t, myByThread;
   unsigned int p2;
 
   p2 = 2 * p;
-  w = p2 + 1;
+  w = p2 * min + 1;
   q = omega - min;
-  sieve.reset();
+  sieve.reset(min);
+  myByThread = max - min;
 
   while (true) {
     if (sieve.next()) {
@@ -782,9 +801,8 @@ void primarityTest_worker(int &threadn, int &reached, unsigned int p,
       }
       if (mpz_divisible_p(q.get_mpz_t(), w.get_mpz_t()) != 0) {
         reached++;
-        mpz_class t;
-        t = q / w;
-        gmp_printf("k=%Zd.\n", t.get_mpz_t());
+        t = w / (p2);
+        sync_printf("ID=%d, k=%Zd.\n", ID, t.get_mpz_t());
         break;
       }
     }
@@ -792,13 +810,12 @@ void primarityTest_worker(int &threadn, int &reached, unsigned int p,
     w += p2;
     r++;
   }
-  threadn++;
-  printf("Terminating %d.\n", threadn);
-  // terminate();
+
+  sync_printf("Terminating %d.\n", ID);
 }
 
 int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
-                  int debug) {
+                  unsigned int phases, int debug) {
 
   mpz_class mersenne;
   mpz_class omega;
@@ -810,6 +827,7 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
   int threadn = 0;
   vector<thread> threads;
   kdTimer kt;
+  int phase = 1;
 
   // Get Mersenne
   mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
@@ -821,23 +839,39 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
   // Get square root
   mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
   kMax = (root - 1) / (2 * p);
-  kByThread = kMax / nThreads;
 
-  for (int i = 0; i < nThreads; i++) {
-    min = (i * kByThread) + 1;
-    threads.emplace_back(thread(primarityTest_worker, ref(threadn),
-                                ref(reached), p, presieving, min, kByThread,
-                                mersenne, omega, root));
-  }
+  kByThread = (kMax / (phases * nThreads)) + 1;
 
+  min = 1;
   kt.start();
-  for (thread &t : threads) {
-    if (t.joinable()) {
-      t.join();
+  for (phase = 0; phase < phases; phase++) {
+    printf("Phase %d of %d.\n", phase, phases);
+    threadn = 0;
+
+    for (int i = 0; i < nThreads; i++) {
+      max = min + kByThread;
+      threads.emplace_back(thread(primarityTest_worker, ref(threadn),
+                                  ref(reached), p, presieving, min, max, omega,
+                                  root));
+      min += kByThread;
+    }
+
+    for (thread &t : threads) {
+      if (t.joinable()) {
+        t.join();
+      }
+    }
+    
+    threads.clear();
+
+    if (reached > 0) {
+      break;
+    }
+    if (min > kMax) {
+      break;
     }
   }
   printf("Time: %f.\n", kt.stop());
-
   return 0;
 }
 
@@ -851,6 +885,7 @@ int main(int argc, char *argv[]) {
   int64 p;
   int from = 0;
   int to = 0;
+  int phases = 1;
   mpz_class exp;
 
   argHdl.add(argument(0, (char *)"d", (char *)"debug", (char *)"Debug level",
@@ -893,6 +928,9 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(12, (char *)"h", (char *)"H", (char *)"Threads to use",
                       (char *)"N"));
 
+  argHdl.add(
+      argument(13, (char *)"s", (char *)"S", (char *)"Phases", (char *)"N"));
+
   while (action > -1) {
     action = argHdl.getAction();
 
@@ -922,7 +960,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 6:
-      primarityTest(p);
+      // primarityTest(p);
       break;
 
     case 7:
@@ -942,11 +980,15 @@ int main(int argc, char *argv[]) {
       break;
 
     case 11:
-      primarityTest(p, to, nThreads, debugLevel);
+      primarityTest(p, to, nThreads, phases, debugLevel);
       break;
 
     case 12:
       argHdl.pvalue(&nThreads);
+      break;
+
+    case 13:
+      argHdl.pvalue(&phases);
       break;
     }
   }
