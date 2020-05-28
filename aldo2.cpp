@@ -609,21 +609,89 @@ int primarityTest(unsigned int p) {
 }
 */
 
-int primarityTest(unsigned int p, unsigned int presieving) {
+primeHolder::primeHolder(unsigned int mersenneExponent, unsigned int n) {
+
+  unsigned int p2 = 2 * mersenneExponent;
+  unsigned int t;
+  this->index = 1;
+  this->prime = n;
+  this->prime1 = n + 1;
+  this->key = 1;
+
+  t = p2 + 1;
+  while (t % n != 0) {
+    this->key++;
+    t += p2;
+  }
+}
+
+void primeHolder::reset() { this->index = 1; }
+
+bool primeHolder::next() {
+  bool r = (this->index != this->key); // Return true if a coprime number
+  this->index++;
+  if (this->index == this->prime1) {
+    this->index = 1;
+  }
+  return r;
+}
+
+primeSieve::primeSieve(unsigned int mersenneExponent, unsigned int upTo) {
+  mpz_class t;
+  t = 3;
+  while (true) {
+    primeHolder ph(mersenneExponent, t.get_ui());
+    this->holders.push_back(ph);
+    mpz_nextprime(t.get_mpz_t(), t.get_mpz_t());
+    if (t.get_ui() > upTo) {
+      break;
+    }
+  }
+  mpz_primorial_ui(this->primorial.get_mpz_t(), upTo);
+  this->primorial /= 2;
+}
+
+void primeSieve::reset() {
+  for (int i = 0; i < this->holders.size(); i++) {
+    this->holders[i].reset();
+  }
+}
+
+bool primeSieve::next() {
+  bool r = true;
+  for (int i = 0; i < this->holders.size(); i++) {
+    r &= this->holders[i].next();
+  }
+  return r;
+}
+
+float primeSieve::ratio() {
+  this->reset();
+  mpz_class i, j;
+
+  for (i = 0; i < this->primorial; i++) {
+    if (this->next())
+      j++;
+  }
+  float r = 1 - (j.get_d() / this->primorial.get_d());
+  return r;
+}
+
+int primarityTest_3(unsigned int p, unsigned int presieving, int debug) {
 
   mpz_class mersenne;
   mpz_class omega;
+  mpz_class root;
+  mpz_class limit; // k limit factor for number under squere root of mersenne
+
   mpz_class a, b, t, d;
-  unsigned int index0 = 1;
-  vector<unsigned int> st(index0, 1);
-  vector<unsigned int> primes;
-  vector<vector<unsigned int>> sieve;
+  kdTimer kt;
+  kdProcessBenchmark kpb;
+
   unsigned int i;
-  unsigned int j;
-  unsigned int k;
-  float f;
+  // unsigned int j;
+  // unsigned int k;
   unsigned int p2;
-  size_t primesSize;
 
   p2 = 2 * p;
 
@@ -634,86 +702,136 @@ int primarityTest(unsigned int p, unsigned int presieving) {
   // Get omega:
   omega = (mersenne - 1) / (2 * p);
 
-  // Get prime initial secuence
-  t = 2;
-  while (t.get_ui() <= presieving) {
-    mpz_nextprime(t.get_mpz_t(), t.get_mpz_t());
-    primes.push_back(t.get_ui());
-    index0 *= t.get_ui();
+  // Get square root
+  mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+
+  if (debug > 0) {
+    gmp_printf("Building sieve.\n");
   }
 
-  st.resize(index0, 1);
-
-  for (i = 0; i < primes.size(); i++) {
-    vector<unsigned int> data;
-    t = p2 + 1;
-    for (j = 0; j < primes[i]; j++) {
-      if (mpz_divisible_ui_p(t.get_mpz_t(), primes[i]) != 0) {
-        data.push_back(0);
-      } else {
-        data.push_back(1);
-      }
-      t += p2;
-    }
-    sieve.push_back(data);
+  primeSieve sieve(p, presieving);
+  if (debug > 9) {
+    gmp_printf("Ratio: %f. \n", sieve.ratio());
+  }
+  if (debug > 0) {
+    gmp_printf("Starting process. \n");
   }
 
-  gmp_printf("Making pre sieve table. \n");
-
-  for (i = 0; i < index0; i++) {
-    for (j = 0; j < sieve.size(); j++) {
-      if (sieve[j][i % primes[j]] == 0) {
-        st[i] = 0;
-        break;
-      }
-    }
-  }
-
-  // Make table
-  /*
-  k = 0;
-  t = 2 * p + 1;
-  primesSize = primes.size();
-  for (i = 0; i < index0; i++) {
-    j = 0;
-    while (j < primesSize) {
-      if (mpz_divisible_ui_p(t.get_mpz_t(), primes[j]) != 0) {
-        st[i] = 0;
-        k++;
-        break;
-      }
-      j++;
-    }
-    t += p2;
-  }
-  */
-
-  f = (float)k / (float)index0;
-  printf("Ratio: %f.\n", f);
-
-  gmp_printf("Starting process. \n");
-
+  kt.start();
   i = 0;
   t = p2 + 1;
   b = omega - 1;
+  sieve.reset();
+  kpb.start();
   while (true) {
-    if (st[i] == 1) {
+    if (sieve.next()) {
+      if (debug > 1) {
+        if (!kpb.tick()) {
+          gmp_printf("%Zd.\n", t.get_mpz_t());
+        }
+      }
       if (mpz_divisible_p(b.get_mpz_t(), t.get_mpz_t()) != 0) {
         a = (t - 1) / p2;
         gmp_printf("%Zd, %Zd\n ", a.get_mpz_t(), t.get_mpz_t());
         break;
       }
+      if (t > root) {
+        printf("Prime number.\n");
+        break;
+      }
     }
     b--;
-    i++;
     t += p2;
-    if (i == index0) {
-      i = 0;
-      a = (t - 1) / p2;
-      gmp_printf("k=%Zd, t=%Zd.\n", a.get_mpz_t(), t.get_mpz_t());
+  }
+
+  kpb.stop();
+  printf("Time: %f.\n", kt.stop());
+  return 1;
+}
+
+void primarityTest_worker(int &threadn, int &reached, unsigned int p,
+                          unsigned int presieve, mpz_class min,
+                          mpz_class byThread, mpz_class mersenne,
+                          mpz_class omega, mpz_class root) {
+
+  /*
+  void primarityTest_worker(int &threadn, int &reached, unsigned int presieve,
+                            unsigned int p2, mpz_class w, mpz_class q) {
+                              */
+
+  primeSieve sieve(p, presieve);
+  mpz_class q, w, r;
+  mpz_class myByThread = byThread + 1;
+  unsigned int p2;
+
+  p2 = 2 * p;
+  w = p2 + 1;
+  q = omega - min;
+  sieve.reset();
+
+  while (true) {
+    if (sieve.next()) {
+      if (r > myByThread || reached > 0) {
+        break;
+      }
+      if (mpz_divisible_p(q.get_mpz_t(), w.get_mpz_t()) != 0) {
+        reached++;
+        mpz_class t;
+        t = q / w;
+        gmp_printf("k=%Zd.\n", t.get_mpz_t());
+        break;
+      }
+    }
+    q--;
+    w += p2;
+    r++;
+  }
+  threadn++;
+  printf("Terminating %d.\n", threadn);
+  // terminate();
+}
+
+int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
+                  int debug) {
+
+  mpz_class mersenne;
+  mpz_class omega;
+  mpz_class root;
+  mpz_class byThread;
+  mpz_class min, max, kmax;
+  int reached = 0;
+  int threadn = 0;
+  vector<thread> threads;
+  kdTimer kt;
+
+  // Get Mersenne
+  mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
+  mersenne--;
+
+  // Get omega:
+  omega = (mersenne - 1) / (2 * p);
+
+  // Get square root
+  mpz_sqrt(root.get_mpz_t(), mersenne.get_mpz_t());
+  kmax = root / (2 * p);
+  byThread = kmax / nThreads;
+
+  for (int i = 0; i < nThreads; i++) {
+    min = (i * byThread) + 1;
+    threads.emplace_back(thread(primarityTest_worker, ref(threadn),
+                                ref(reached), p, presieving, min, byThread,
+                                mersenne, omega, root));
+  }
+
+  kt.start();
+  for (thread &t : threads) {
+    if (t.joinable()) {
+      t.join();
     }
   }
-  return 1;
+  printf("Time: %f.\n", kt.stop());
+
+  return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -722,6 +840,7 @@ int main(int argc, char *argv[]) {
   int debugLevel;
   int action;
   int maxPrime;
+  int nThreads = 1;
   int64 p;
   int from = 0;
   int to = 0;
@@ -762,6 +881,9 @@ int main(int argc, char *argv[]) {
                       (char *)"Composite mersenne test", (char *)"N"));
 
   argHdl.add(argument(11, (char *)"m", (char *)"M", (char *)"Primarity test",
+                      (char *)"N"));
+
+  argHdl.add(argument(12, (char *)"h", (char *)"H", (char *)"Threads to use",
                       (char *)"N"));
 
   while (action > -1) {
@@ -813,7 +935,11 @@ int main(int argc, char *argv[]) {
       break;
 
     case 11:
-      primarityTest(p, to);
+      primarityTest(p, to, nThreads, debugLevel);
+      break;
+
+    case 12:
+      argHdl.pvalue(&nThreads);
       break;
     }
   }

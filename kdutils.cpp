@@ -169,7 +169,10 @@ template <typename T> bool ifExists(vector<T> &vect, T &elem) {
 
 string yesOrNot(bool booleanValue) { return booleanValue ? "yes" : "no"; }
 
-kdPocketBit::kdPocketBit(size_t size) { this->data.reserve(size / 8); }
+kdPocketBit::kdPocketBit(size_t size, bool initial) {
+  this->data.resize(size / 8, initial);
+   this->index = 0;
+}
 
 void kdPocketBit::set(int64 position, bool status) {
   int64 p = position / 8;
@@ -218,13 +221,8 @@ bool kdPocketBit::read() {
   } else {
     rr = false;
   }
-  this->offest++;
 
-  if (this->offest == 8) {
-    this->offest = 0;
-    this->index++;
-    this->byte = this->data[this->index];
-  }
+  this->pass();
 
   return rr;
 }
@@ -233,4 +231,13 @@ void kdPocketBit::reset() {
   this->index = 0;
   this->offest = 0;
   this->byte = this->data[this->index];
+}
+
+void kdPocketBit::pass() {
+  this->offest++;
+  if (this->offest == 8) {
+    this->offest = 0;
+    this->index++;
+    this->byte = this->data[this->index];
+  }
 }

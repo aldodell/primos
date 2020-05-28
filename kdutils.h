@@ -66,18 +66,19 @@ private:
 
 class kdPocketBit {
 public:
-  kdPocketBit(size_t size);
+  kdPocketBit(size_t size, bool initial = false);
   void set(int64 position, bool status);
   bool get(int64 position);
   vector<unsigned char> data;
   void reset();
   void write(bool status);
   bool read();
+  void pass();
 
 private:
   int64 index;
-  unsigned int offest;
-  unsigned int byte;
+  unsigned char offest;
+  unsigned char byte;
 };
 
 std::string string_join(const std::vector<std::string> &elements,
