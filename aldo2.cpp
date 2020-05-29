@@ -844,6 +844,7 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
 
   min = 1;
   kt.start();
+
   for (phase = 0; phase < phases; phase++) {
     printf("Phase %d of %d.\n", phase, phases);
     threadn = 0;
@@ -861,7 +862,7 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
         t.join();
       }
     }
-    
+
     threads.clear();
 
     if (reached > 0) {
@@ -871,6 +872,11 @@ int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
       break;
     }
   }
+
+  if (reached == 0) {
+    printf("Is prime!\n");
+  }
+
   printf("Time: %f.\n", kt.stop());
   return 0;
 }
