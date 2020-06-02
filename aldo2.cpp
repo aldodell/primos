@@ -782,7 +782,8 @@ void primarityTest_worker(int &threadn, int &reached, unsigned int p,
                           mpz_class omega, mpz_class root) {
   int ID = threadn++;
 
-  sync_printf("Init: %d. min=%Zd\n", ID, min.get_mpz_t());
+  // sync_printf("Init: %d. min=%Zd\n", ID, min.get_mpz_t());
+  sync_printf("Init: %d.\n", ID);
 
   primeSieve sieve(p, presieve);
   mpz_class q, w, r, t, myByThread;
