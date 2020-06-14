@@ -431,7 +431,38 @@
                 "$eslint-stylish"
             ]
         },
-        ,
+        {
+            "label": "Build primelib  with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                //"-DPRIME_TESTER_LIB=lib",
+                // "-DBIG_GEARS_FACTORIZER_LIB",
+                "-DBIG_HALF_GEAR_FACTORIZER_LIB",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                "maths_prime.cpp",
+                // "primeTester.cpp",
+                "bigFactorObject.cpp",
+                // "bigGearsFactorizer.cpp",
+                "bigHalfGearFactorizer.cpp",
+                "primelib.cpp",
+                "-o",
+                "primelib.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
         {
             "label": "Build ONI with Clang",
             "type": "shell",

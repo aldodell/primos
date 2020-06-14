@@ -10,7 +10,9 @@ bool isMersenneKnowPrimeExponent(mpz_class p) {
   return r;
 }
 
+
 /** Return if a number is a 4k+1 */
+/*
 bool is4kp1(mpz_class n) {
   int t = n.get_ui() % 4;
   if (t == 1 || t == 2) {
@@ -19,6 +21,7 @@ bool is4kp1(mpz_class n) {
     return false;
   }
 }
+*/
 
 /** Return 1 or 7, dependig wich digit M finish */
 int lastDigit(mpz_class exponent) {
@@ -810,6 +813,7 @@ void primarityTest_worker(int &threadn, int &reached, unsigned int p,
     q--;
     w += p2;
     r++;
+    
   }
 
   sync_printf("Terminating %d.\n", ID);

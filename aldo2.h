@@ -8,6 +8,7 @@
 #include "kdutils.h"
 #include "maths_prime.h"
 #include "primeTester.h"
+#include "primelib.h"
 #include "string"
 #include <gmpxx.h>
 #include <thread>
@@ -31,10 +32,10 @@ bool isMersenneKnowPrimeExponent(mpz_class p);
 void analysis(unsigned int p, unsigned int limit = 0);
 void analysis2(unsigned int to = 1000, unsigned int from = 0);
 int primarityTest(unsigned int p, unsigned int presieving, int nThreads,
-                  unsigned int phases = 1, int debug=0);
+                  unsigned int phases = 1, int debug = 0);
 
 /** Return if a number is a 4k+1 */
-bool is4kp1(mpz_class n);
+// bool is4kp1(mpz_class n);
 
 class primeHolder {
 public:
