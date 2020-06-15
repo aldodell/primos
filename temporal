@@ -1274,3 +1274,72 @@ char z = this->lastDigit(n);
       break;
     }
   }
+
+
+
+      /*
+    if (r - q > 200) {
+      t = b * b + 2 * b - 4 * (q) + 1;
+      mpz_sqrt(t.get_mpz_t(), t.get_mpz_t());
+      t = t + 1;
+      if (mpz_tstbit(t.get_mpz_t(), 0 == 0)) {
+        t++;
+      }
+      d = ((t + a) / 2) * (((t - a) / 2) + 1);
+      a = t;
+      r -= d;
+    } else {
+      r -= a;
+      a += 2;
+    }
+    */
+
+    // 1+sqrt(b^2+2*b-4*i+1)
+
+    /*
+    if (r - q > 200) {
+      t = b * b + 2 * b - 4 * (q) + 1;
+      mpz_sqrt(t.get_mpz_t(), t.get_mpz_t());
+      t = t + 1;
+      if (mpz_tstbit(t.get_mpz_t(), 0 == 0)) {
+        t--;
+      }
+      d = ((t + a) / 2) * (((t - a) / 2) + 1);
+      a = t + 2;
+      r -= d;
+    } else {
+      r -= a;
+      a += 2;
+    }
+  } else if (r < q) {
+    b += 2;
+    r += b;
+  }
+  */
+
+
+
+
+
+
+  // Calculate first secuences of end digit
+  sa[0] = (p2 * 1 + 1) % 10;
+  sa[1] = (p2 * 2 + 1) % 10;
+  sa[2] = (p2 * 3 + 1) % 10;
+  sa[3] = (p2 * 4 + 1) % 10;
+
+  // Calculate first secuences of end digit
+  sb[0] = (p2 * b + 1) % 10;
+  sb[1] = (p2 * (b - 1) + 1) % 10;
+  sb[2] = (p2 * (b - 2) + 1) % 10;
+  sb[3] = (p2 * (b - 3) + 1) % 10;
+
+  fa = p2 * a + 1;
+  fb = p2 * b + 1;
+
+  t = fa * fb;
+
+  if (t == mersenne) {
+    printf("Isn't prime.\n");
+    return -1;
+  }

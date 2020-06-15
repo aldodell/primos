@@ -10,6 +10,7 @@
 
 class bigHalfGearFactorizer {
 public:
+  unsigned int debug=0;
   vector<mpz_class> factors;
   void clear();
   void find(mpz_class n);
