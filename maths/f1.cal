@@ -1,0 +1,26 @@
+define oniFirstSquare(from)
+{
+	local s, i, j, f, m, p;
+	j = from;
+	i = from;
+	f = 1;
+	m = (from ^ 2) - (2 * from);
+	printf("m=%d\n ", m);
+
+	while (f == 1) {
+		while (issq(j) == 0) {
+			i += 2;
+			j += i;
+		}
+		printf("i=%d j=%d\n ", i, j);
+		p = ((i ^ 2) + (2 * i) - m) / 4;
+
+		printf("p=%d\n ", p);
+		if (issq(p)) {
+			printf("\nj=%d.\n", j);
+			f = 0;
+		}
+		i += 2;
+		j += i;
+	}
+}

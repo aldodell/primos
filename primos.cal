@@ -1,0 +1,28 @@
+p=29;
+	m = 2^p-1;
+	o = (m-1) / (2*p);
+	p2=2*p;
+
+define q(p) 
+{
+	local m,o,z,w,i,p2,flag;
+	m = 2^p-1;
+	o = (m-1) / (2*p);
+	p2=2*p;
+	printf("M = %d.\n", m);
+	printf("o = %d.\n", o);
+	printf("2*p = %d.\n", p2);
+
+	flag = 1;
+	i=2;
+	while(flag==1) {
+		z=(o-i)%p2;
+		if(z==0) {
+			w = (o-i) / p2; /* producto ab */
+			flag=0;
+			printf("i = %d.\n", i);
+			printf("w = %d.\n", w);
+		}	
+		i++;
+	}
+}
