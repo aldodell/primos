@@ -1,26 +1,193 @@
-define oniFirstSquare(from)
-{
-	local s, i, j, f, m, p;
-	j = from;
-	i = from;
-	f = 1;
-	m = (from ^ 2) - (2 * from);
-	printf("m=%d\n ", m);
+define oniFirstSquare(from) {
+  local s, i, j, f, m, p;
+  j = from;
+  i = from;
+  f = 1;
+  m = (from ^ 2) - (2 * from);
+  printf("m=%d\n ", m);
 
-	while (f == 1) {
-		while (issq(j) == 0) {
-			i += 2;
-			j += i;
-		}
-		printf("i=%d j=%d\n ", i, j);
-		p = ((i ^ 2) + (2 * i) - m) / 4;
+  while (f == 1) {
+    while (issq(j) == 0) {
+      i += 2;
+      j += i;
+    }
+    printf("i=%d j=%d\n ", i, j);
+    p = ((i ^ 2) + (2 * i) - m) / 4;
 
-		printf("p=%d\n ", p);
-		if (issq(p)) {
-			printf("\nj=%d.\n", j);
-			f = 0;
-		}
-		i += 2;
-		j += i;
-	}
+    printf("p=%d\n ", p);
+    if (issq(p)) {
+      printf("\nj=%d.\n", j);
+      f = 0;
+    }
+    i += 2;
+    j += i;
+  }
+}
+
+define oni3(top) {
+  local flag, i, j;
+  flag = 1;
+
+  i = top;
+  j = 0;
+  while (flag == 1) {
+    j += i;
+    if (issq(j)) {
+      flag = 0;
+      printf("[[%d,%d]] Sum=%d\n", i, top, j);
+    }
+    i -= 2;
+  }
+}
+
+define oni4(x, y) {
+  local p, m, a, b, c, d, p1, p2, r;
+  local f1, f2, f3;
+  p = x ^ y;
+  m = p / 2;
+
+  printf("Base: %d, exponent:%d, power:%d, middle:%d\n", x, y, p, m);
+
+  /*
+  a^b + c^d = x^y;
+  p = x^y;
+  m = p/2;
+  p1 = a^b;
+  p2 = c^d;
+
+  a^b < m;
+  c^d > m;
+
+  m-(a^b) = (c^d) - m;
+  2m = (c^d) - (a^b);
+  p = (c^d) - (a^b)
+
+  */
+
+  /*
+   p1 = m;
+   if (!isint(m)) {
+     p1 -= 0.5;
+   }
+
+   if (iseven(p1)) {
+     p1--;
+   }
+   */
+  p1 = p - 2;
+
+  f1 = 1;
+  f2 = 1;
+  d = 2;
+  b = 2;
+  while (f1) {
+
+    /* Buscamos el primer grupo a^b=p1, con b=2. Por tanto a^2=p1; */
+
+    while (f2) {
+      if (!issq(p1)) {
+        p1 -= 2;
+        if (p1 == 1) {
+          return 0;
+        }
+      } else {
+        a = sqrt(p1);
+        f2 = 0;
+        printf("%d^2=%d\n", a, p1);
+      }
+    }
+
+    /* Tomamos el segundo grupo c^d = (x^y) - (a^b) */
+    p2 = p - p1;
+    printf("c^d = %d\n", p2);
+
+    /* Evaluamos cuál raíz aplica al segundo grupo, empezando desde d=2 */
+    f3 = 1;
+    d = 2;
+    while (f3) {
+      c = root(p2, d);
+
+      /* Si la raíz es un número menor a 2 salimos, e intentamos disminuir p1 */
+      if (c < 2) {
+        p1 -= 2;
+        f3 = 0;
+        f2 = 1;
+      }
+
+      /* Si la raíz es entera terminamos */
+      if (isint(c)) {
+        f1 = 0;
+        f2 = 0;
+        f3 = 0;
+        r = strprintf("%d^%d + %d^%d", a, b, c, d);
+        print r;
+        return r;
+      }
+
+      /* Si no conseguimos la raiz entera aumentamos el índice */
+      d++;
+    }
+  }
+}
+
+define oni5(x, y) {
+  local a, b, c, d, p, m, p1, p2;
+  local f1, f2, f3; /* flags */
+
+  if (y < 4) {
+    print "exponent must be greater than 3";
+    return 0;
+  }
+
+  p = x ^ y;
+  m = p / 2;
+
+  p1 = m;
+  if (!isint(p1)) {
+    p1 -= 0.5;
+  }
+  if (iseven(p1)) {
+    p1--;
+  }
+  printf("a^b=%d\n", p1);
+
+  b = 2;
+  f3 = 1;
+  while (f3) {
+    /* Buscamos las raices inicialmente en 2 */
+    f1 = 1;
+    while (f1) {
+      a = root(p1, b);
+      if (isint(a)) {
+        f1 = 0;
+      } else {
+        p1 -= 2;
+        if (p1 == 1) {
+          return 0;
+        }
+      }
+    }
+
+    p2 = p - p1;
+
+    printf("a^b=%d^%d=%d\nc^d=%d\n", a, b, p1, p2);
+
+    f2 = 1;
+    d = b + 1;
+    while (f2) {
+      f1 = 1;
+      d++;
+      while (f1) {
+        c = root(p2, d);
+        if (isint(c)) {
+          f1 = 0;
+        } else {
+          p2 -= 2;
+          if (p2 == 1) {
+            return 0;
+          }
+        }
+      }
+    }
+  }
 }
