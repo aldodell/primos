@@ -68,7 +68,8 @@
 			"*.tcc": "cpp",
 			"hashtable": "cpp",
 			"thread": "cpp",
-			"__memory": "cpp"
+			"__memory": "cpp",
+			"*.cal": "cpp"
 		}
 	}
 }

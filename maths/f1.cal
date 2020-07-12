@@ -24,6 +24,7 @@ define oniFirstSquare(from) {
   }
 }
 
+/*
 define oni(x, y) {
   local a, b, c, d, p1, p2, p, r, t1, t2;
   local f1, f2;
@@ -49,12 +50,12 @@ define oni(x, y) {
         }
       }
     }
-	printf("%d %d\n", p1, (p1-t1));
-	t1 = p1;
+        printf("%d %d\n", p1, (p1-t1));
+        t1 = p1;
   }
 }
 
-/*
+
     d = 3;
     f1 = 1;
     p2 = p - p1;
@@ -83,3 +84,150 @@ define oni(x, y) {
 
   printf("∆=%d\n", r);
   */
+
+define oni(x, y) {
+  local a, b, c, d, p1, p2, p, r, t1, t2, m;
+  local f1, f2;
+  local maxPowerB, maxPowerD;
+
+  p = x ^ y;
+  m = p / 2;
+  maxPowerB = 3;
+  maxPowerD = 9;
+
+  p1 = m;
+  if (!isint(p1)) {
+    p1 = int(p1);
+  }
+
+  if (!iseven(y) && iseven(p1)) {
+    p1--;
+  }
+
+  p1 += 2;
+firstStage:
+  /* printf("First stage\n", p1);*/
+
+  do {
+    p1 -= 2;
+    /*printf("p1=%d\n", p1);*/
+    b = maxPowerB;
+    do {
+      a = iroot(p1, b);
+      if (a ^ b == p1) {
+        /* printf("a^b=p1\n", p1); */
+        goto secondStage; /* Successfull */
+      }
+
+      b--;
+      if (b < 2) {
+        /* printf("b<2\n", p1); */
+        break; /* Fail */
+      }
+
+    } while (1);
+  } while (1);
+
+secondStage:
+  p2 = p - p1;
+  printf("a^b=%d^%d=%d p2=%d\n", a, b, p1, p2);
+  /*  printf("2nd stage\n", p1);*/
+
+  d = maxPowerD;
+  do {
+    c = iroot(p2, d);
+    if (c ^ d == p2) {
+      goto success;
+    }
+
+    d--;
+    if (d < 2) {
+      goto firstStage;
+    }
+
+  } while (1);
+
+success:
+  printf("a^b=%d^%d=%d c^d=%d^%d=%d\n", a, b, p1, c, d, p2);
+
+exiting:
+  return 0;
+}
+
+define oni2(x, y, minb, maxb, mind, maxd) {
+  local a, b, c, d, p1, p2, p, r, t1, t2, m;
+  local f1, f2;
+  /* local maxb, maxd; */
+
+  p = x ^ y;
+  m = p / 2;
+
+  p1 = int(m);
+
+  if (!iseven(y) && iseven(p1)) {
+    p1--;
+  }
+
+  a = 1;
+
+stage1:
+  do {
+    a += 2;
+    if (a > m) {
+      goto exiting;
+    }
+    b = minb - 1;
+
+    do {
+      b++;
+      if (b > maxb) {
+        goto stage1;
+      }
+
+      p1 = a ^ b;
+      p2 = p - p1;
+      d = mind;
+
+      if (p2 < 0) {
+        break;
+      }
+      do {
+        c = iroot(p2, d);
+        if (c < 2) {
+          goto stage1;
+        }
+        if (c ^ d == p2) {
+          if (isint(a / x) || isint(c / x)) {
+            goto stage1;
+          }
+          goto success;
+        }
+        d++;
+        if (d > maxd) {
+          break;
+        }
+
+      } while (1);
+    } while (1);
+  } while (1);
+
+success:
+  /* printf("a^b=%d^%d=%d c^d=%d^%d=%d p1+p2=%d a^b+c^d=%d\n", a, b, p1, c, d,
+     p2, (p1 + p2), p);
+                  */
+
+  printf("%d^%d+%d^%d=%d^%d\n", a, b, c, d, x, y);
+
+exiting:
+
+}
+
+define oni3(xa, xb, ya, yb, minb, maxb, mind, maxd) {
+
+  local i, j;
+  for (i = xa; i <= xb; i++) {
+    for (j = ya; j <= yb; j++) {
+      print oni2(i, j, 2, 4, 2, 4);
+    }
+  }
+}
