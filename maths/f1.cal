@@ -172,12 +172,12 @@ define oni2(x, y, minb, maxb, mind, maxd) {
 
 stage1:
   do {
-    a += 2;
+    a += 1;
     if (a > m) {
       goto exiting;
     }
     b = minb - 1;
-
+    printf("testing %d^%d+%d^%d\n", a, b + 1, c, d);
     do {
       b++;
       if (b > maxb) {
@@ -191,15 +191,22 @@ stage1:
       if (p2 < 0) {
         break;
       }
+
+      if (p1 > m) {
+        break;
+      }
+
       do {
         c = iroot(p2, d);
         if (c < 2) {
           goto stage1;
         }
         if (c ^ d == p2) {
+
           if (isint(a / x) || isint(c / x)) {
             goto stage1;
           }
+
           goto success;
         }
         d++;
@@ -215,19 +222,132 @@ success:
   /* printf("a^b=%d^%d=%d c^d=%d^%d=%d p1+p2=%d a^b+c^d=%d\n", a, b, p1, c, d,
      p2, (p1 + p2), p);
                   */
-
-  printf("%d^%d+%d^%d=%d^%d\n", a, b, c, d, x, y);
+  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+  return r;
 
 exiting:
-
+  return "";
 }
 
-define oni3(xa, xb, ya, yb, minb, maxb, mind, maxd) {
+define oni3(minx, maxx, miny, maxy, minb, maxb, mind, maxd) {
 
-  local i, j;
-  for (i = xa; i <= xb; i++) {
-    for (j = ya; j <= yb; j++) {
-      print oni2(i, j, 2, 4, 2, 4);
+  local i, j, s;
+  for (i = minx; i <= maxx; i++) {
+    for (j = miny; j <= maxy; j++) {
+      printf("%d^%d = %s\n", i, j, oni2(i, j, minb, maxb, mind, maxd));
     }
   }
+}
+
+define oni4(x, y, bMin, bMax, dMin, dMax) {
+
+  local p1, p2, p, m, a, b, c, d, t, r, z;
+  p = x ^ y;
+  m = p / 2;
+
+  a = 1;
+  z = 0;
+  do {
+    printf("%d^%d\n", a, b);
+    z++;
+    if (z == 1000000) {
+      z = 0;
+      printf("*\n");
+    }
+    a += 2;
+    b = bMin;
+    p1 = a ^ b;
+    if (p1 > m) {
+      goto coda;
+    }
+    do {
+      p1 = a ^ b;
+      if (p1 > m) {
+        break;
+      }
+      p2 = p - p1;
+      d = dMin;
+      do {
+        c = iroot(p2, d);
+        t = c ^ d;
+        if (p2 == t) {
+
+          if (isint(a / x) || isint(c / x)) {
+            break;
+          }
+          goto success;
+        }
+        if (t > p2) {
+          break;
+        }
+        d++;
+        if (d > dMax) {
+          break;
+        }
+      } while (1);
+      b++;
+      if (b > bMax) {
+        break;
+      }
+    } while (1);
+  } while (1);
+
+success:
+  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+  return r;
+
+coda:
+}
+
+define oni5(x, y, minb, maxb, mind, maxd) {
+  local a, b, c, d;
+  local p1, p2;
+  local p, m, r, t;
+
+  p = x ^ y;
+  m = int(p / 2);
+
+  a = 1;
+
+  do {
+    d = mind;
+    a += 2;
+    if ((a ^ minb) > m) {
+      goto out;
+    }
+
+    for (b = minb; b < maxb; b++) {
+     /* printf("%d^%d\n", a, b); */
+      p1 = a ^ b;
+
+      if (p1 > m) {
+        break;
+      }
+
+      p2 = p - p1;
+      /*print p2;*/
+
+      for (d = mind; d < maxd; d++) {
+        c = iroot(p2, d);
+        if (c == 1) {
+          break;
+        }
+        t = c ^ d;
+        if (t == p2) {
+          if (isint(a / x) || isint(c / x)) {
+            printf("No coprime: %d^%d+%d^%d=%d^%d\n", a, b, c, d, x, y);
+          } else {
+            goto success;
+          }
+        }
+      }
+    }
+
+  } while (1);
+
+success:
+  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+  return r;
+
+out:
 }
