@@ -24,282 +24,7 @@ define oniFirstSquare(from) {
   }
 }
 
-/*
-define oni(x, y) {
-  local a, b, c, d, p1, p2, p, r, t1, t2;
-  local f1, f2;
-  p = x ^ y;
-
-  b = 2;
-  f1 = 1;
-  f2 = 1;
-  p1 = p - 8;
-
-  while (f2) {
-    p1 -= 2;
-    f1 = 1;
-    while (f1) {
-      a = iroot(p1, b);
-      if ((a ^ b) == p1) {
-        f1 = 0;
-        printf("a=%d\n", a);
-      } else {
-        p1 -= 2;
-        if (p1 == 1) {
-          return 0;
-        }
-      }
-    }
-        printf("%d %d\n", p1, (p1-t1));
-        t1 = p1;
-  }
-}
-
-
-    d = 3;
-    f1 = 1;
-    p2 = p - p1;
-
-    while (f1) {
-      c = iroot(p2, d);
-      if (c == 2) {
-        f1 = 0;
-      } else {
-        if ((c ^ d) == p2) {
-          r = p - (a ^ b) - (c ^ d);
-          if (r == 0) {
-            f2 = 0;
-            f1 = 0;
-          }
-
-        } else {
-          d++;
-        }
-      }
-    }
-
-    p1 -= 2;
-  }
-  printf("a^b=%d^%d=%d c^d=%d^%d=%d\n", a, b, p1, c, d, p2);
-
-  printf("∆=%d\n", r);
-  */
-
-define oni(x, y) {
-  local a, b, c, d, p1, p2, p, r, t1, t2, m;
-  local f1, f2;
-  local maxPowerB, maxPowerD;
-
-  p = x ^ y;
-  m = p / 2;
-  maxPowerB = 3;
-  maxPowerD = 9;
-
-  p1 = m;
-  if (!isint(p1)) {
-    p1 = int(p1);
-  }
-
-  if (!iseven(y) && iseven(p1)) {
-    p1--;
-  }
-
-  p1 += 2;
-firstStage:
-  /* printf("First stage\n", p1);*/
-
-  do {
-    p1 -= 2;
-    /*printf("p1=%d\n", p1);*/
-    b = maxPowerB;
-    do {
-      a = iroot(p1, b);
-      if (a ^ b == p1) {
-        /* printf("a^b=p1\n", p1); */
-        goto secondStage; /* Successfull */
-      }
-
-      b--;
-      if (b < 2) {
-        /* printf("b<2\n", p1); */
-        break; /* Fail */
-      }
-
-    } while (1);
-  } while (1);
-
-secondStage:
-  p2 = p - p1;
-  printf("a^b=%d^%d=%d p2=%d\n", a, b, p1, p2);
-  /*  printf("2nd stage\n", p1);*/
-
-  d = maxPowerD;
-  do {
-    c = iroot(p2, d);
-    if (c ^ d == p2) {
-      goto success;
-    }
-
-    d--;
-    if (d < 2) {
-      goto firstStage;
-    }
-
-  } while (1);
-
-success:
-  printf("a^b=%d^%d=%d c^d=%d^%d=%d\n", a, b, p1, c, d, p2);
-
-exiting:
-  return 0;
-}
-
-define oni2(x, y, minb, maxb, mind, maxd) {
-  local a, b, c, d, p1, p2, p, r, t1, t2, m;
-  local f1, f2;
-  /* local maxb, maxd; */
-
-  p = x ^ y;
-  m = p / 2;
-
-  p1 = int(m);
-
-  if (!iseven(y) && iseven(p1)) {
-    p1--;
-  }
-
-  a = 1;
-
-stage1:
-  do {
-    a += 1;
-    if (a > m) {
-      goto exiting;
-    }
-    b = minb - 1;
-    printf("testing %d^%d+%d^%d\n", a, b + 1, c, d);
-    do {
-      b++;
-      if (b > maxb) {
-        goto stage1;
-      }
-
-      p1 = a ^ b;
-      p2 = p - p1;
-      d = mind;
-
-      if (p2 < 0) {
-        break;
-      }
-
-      if (p1 > m) {
-        break;
-      }
-
-      do {
-        c = iroot(p2, d);
-        if (c < 2) {
-          goto stage1;
-        }
-        if (c ^ d == p2) {
-
-          if (isint(a / x) || isint(c / x)) {
-            goto stage1;
-          }
-
-          goto success;
-        }
-        d++;
-        if (d > maxd) {
-          break;
-        }
-
-      } while (1);
-    } while (1);
-  } while (1);
-
-success:
-  /* printf("a^b=%d^%d=%d c^d=%d^%d=%d p1+p2=%d a^b+c^d=%d\n", a, b, p1, c, d,
-     p2, (p1 + p2), p);
-                  */
-  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
-  return r;
-
-exiting:
-  return "";
-}
-
-define oni3(minx, maxx, miny, maxy, minb, maxb, mind, maxd) {
-
-  local i, j, s;
-  for (i = minx; i <= maxx; i++) {
-    for (j = miny; j <= maxy; j++) {
-      printf("%d^%d = %s\n", i, j, oni2(i, j, minb, maxb, mind, maxd));
-    }
-  }
-}
-
-define oni4(x, y, bMin, bMax, dMin, dMax) {
-
-  local p1, p2, p, m, a, b, c, d, t, r, z;
-  p = x ^ y;
-  m = p / 2;
-
-  a = 1;
-  z = 0;
-  do {
-    printf("%d^%d\n", a, b);
-    z++;
-    if (z == 1000000) {
-      z = 0;
-      printf("*\n");
-    }
-    a += 2;
-    b = bMin;
-    p1 = a ^ b;
-    if (p1 > m) {
-      goto coda;
-    }
-    do {
-      p1 = a ^ b;
-      if (p1 > m) {
-        break;
-      }
-      p2 = p - p1;
-      d = dMin;
-      do {
-        c = iroot(p2, d);
-        t = c ^ d;
-        if (p2 == t) {
-
-          if (isint(a / x) || isint(c / x)) {
-            break;
-          }
-          goto success;
-        }
-        if (t > p2) {
-          break;
-        }
-        d++;
-        if (d > dMax) {
-          break;
-        }
-      } while (1);
-      b++;
-      if (b > bMax) {
-        break;
-      }
-    } while (1);
-  } while (1);
-
-success:
-  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
-  return r;
-
-coda:
-}
-
-define oni5(x, y, minb, maxb, mind, maxd) {
+define oni(x, y, minb, maxb, mind, maxd) {
   local a, b, c, d;
   local p1, p2;
   local p, m, r, t;
@@ -317,15 +42,12 @@ define oni5(x, y, minb, maxb, mind, maxd) {
     }
 
     for (b = minb; b < maxb; b++) {
-     /* printf("%d^%d\n", a, b); */
       p1 = a ^ b;
 
       if (p1 > m) {
         break;
       }
-
       p2 = p - p1;
-      /*print p2;*/
 
       for (d = mind; d < maxd; d++) {
         c = iroot(p2, d);
@@ -350,4 +72,143 @@ success:
   return r;
 
 out:
+}
+
+define getRoot(n, min, max) {
+  local a, b, p;
+  a = 1;
+  do {
+    a++;
+    for (b = min; b <= max; b++) {
+      p = a ^ b;
+      printf("%d^%d\n", a, b);
+      if (p == n) {
+        return strprintf("%d^%d", a, b);
+      } else if (a ^ min > n) {
+        return "0";
+      }
+    }
+  } while (1);
+  return "0";
+}
+
+/** Evalua creciendo */
+define oni4(x, y, bMin, bMax, dMin, dMax) {
+  local a, b, c, d, p, m, p1, p2, t, q;
+  p = x ^ y;
+  m = p / 2;
+  a = 1;
+  if (iseven(p)) {
+    p1 = m - 1;
+    q = 2;
+  } else {
+    p1 = int(m);
+    q = 1;
+  }
+
+  do {
+    a += q;
+    if (a ^ bMin > m) {
+      return "0";
+    }
+    for (b = bMin; b <= bMax; b++) {
+      p1 = a ^ b;
+      if (p1 > m) {
+        break;
+      }
+      p2 = p - p1;
+      for (d = dMin; d <= dMax; d++) {
+        c = iroot(p2, d);
+        if (c < 2) {
+          break;
+        }
+        if (c ^ d == p2) {
+          return strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+        }
+      }
+    }
+  } while (1);
+}
+
+/**
+ * Evalúa decreciendo
+ * */
+define oni5(x, y, bMin, bMax, dMin, dMax) {
+  local a, b, c, d, p, m, p1, p2, q;
+  p = x ^ y;
+  m = p / 2;
+
+  if (iseven(p)) {
+    p1 = m - 1;
+    q = 2;
+  } else {
+    p1 = int(m);
+    q = 1;
+  }
+
+  do {
+    for (b = bMax; b >= bMin; b--) {
+      a = iroot(p1, b);
+      if (a > 1) {
+        if (a ^ b == p1) {
+          p2 = p - p1;
+          for (d = dMax; d >= dMin; d--) {
+            c = iroot(p2, d);
+            if (c > 1) {
+              if (c ^ d == p2) {
+                return strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+              }
+            }
+          }
+        }
+      }
+    }
+    p1 -= q;
+    if (p1 < 2) {
+      return "0";
+    }
+  } while (1);
+}
+
+/**
+ * Evalua creciendo pero 1 a 1
+ * */
+define oni6(x, y, bMin, bMax, dMin, dMax) {
+  local a, b, c, d, p, m, p1, p2;
+  p = x ^ y;
+  m = p / 2;
+
+  a = 1;
+  do {
+    a++;
+    if (a ^ bMin > m) {
+      return "0";
+    }
+    for (b = bMin; b <= bMax; b++) {
+      p1 = a ^ b;
+      if (p1 > m) {
+        break;
+      }
+      p2 = p - p1;
+      for (d = dMin; d <= dMax; d++) {
+        c = iroot(p2, d);
+        if (c < 2) {
+          break;
+        }
+        if (c ^ d == p2 && !isint(p1 / x) && !isint(p2 / x)) {
+          return strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
+        }
+      }
+    }
+  } while (1);
+}
+
+define onix(minx, maxx, miny, maxy, minb, maxb, mind, maxd) {
+
+  local i, j, s;
+  for (i = minx; i <= maxx; i++) {
+    for (j = miny; j <= maxy; j++) {
+      printf("%d^%d = %s\n", i, j, oni6(i, j, minb, maxb, mind, maxd));
+    }
+  }
 }
