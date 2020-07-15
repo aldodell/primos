@@ -182,7 +182,7 @@ define oni6(x, y, bMin, bMax, dMin, dMax) {
   do {
     a++;
     if (a ^ bMin > m) {
-      return "0";
+      return strprintf("NO MATCH a=%d\n", a);
     }
     for (b = bMin; b <= bMax; b++) {
       p1 = a ^ b;
