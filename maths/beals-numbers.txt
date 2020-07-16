@@ -1,305 +1,59 @@
-5^2+12^2=13^2
-9^2+46^2=13^3
-119^2+120^2=13^4
-597^2+122^2=13^5
-2035^2+828^2=13^6
-4449^2+6554^2=13^7
-239^2+28560^2=13^8
-56403^2+86158^2=13^9
-341525^2+145668^2=13^10
-1315911^2+246046^2=13^11
-3455641^2+3369960^2=13^12
-3627003^2+17021162^2=13^13
-23161315^2+58317492^2=13^14
-186118929^2+128629846^2=13^15
-815616479^2+13651680^2=13^16
+3^1 = NO MATCH a=2
+3^2 = NO MATCH a=3
+3^3 = NO MATCH a=4
+3^4 = 2^5+7^2=3^4
+3^5 = NO MATCH a=12
+3^6 = NO MATCH a=20
+3^7 = NO MATCH a=34
+3^8 = NO MATCH a=58
+3^9 = NO MATCH a=100
+3^10 = NO MATCH a=172
+3^11 = NO MATCH a=298
+3^12 = NO MATCH a=516
+3^13 = NO MATCH a=893
+3^14 = NO MATCH a=1547
+3^15 = NO MATCH a=2679
+3^16 = NO MATCH a=4640
+3^17 = NO MATCH a=8036
+3^18 = NO MATCH a=13918
+3^19 = NO MATCH a=24107
+3^20 = NO MATCH a=41754
+3^21 = NO MATCH a=72320
 
 
-11^2+2^2=5^3
-7^2+24^2=5^4
-41^2+38^2=5^5
-117^2+44^2=5^6
-29^2+278^2=5^7
-527^2+336^2=5^8
-1199^2+718^2=5^9
-237^2+3116^2=5^10
-6469^2+2642^2=5^11
-11753^2+10296^2=5^12
-8839^2+33802^2=5^13
-76443^2+16124^2=5^14
-108691^2+136762^2=5^15
-164833^2+354144^2=5^16
-873121^2+24478^2=5^17
-922077^2+1721764^2=5^18
-2521451^2+3565918^2=5^19
+
+7^1 = NO MATCH a=2
+7^2 = NO MATCH a=5
+7^3 = 10^2+3^5=7^3
+7^4 = NO MATCH a=35
+7^5 = NO MATCH a=92
+7^6 = NO MATCH a=243
+7^7 = NO MATCH a=642
+7^8 = NO MATCH a=1698
+7^9 = NO MATCH a=4492
+7^10 = NO MATCH a=11885
+7^11 = NO MATCH a=31444
+7^12 = NO MATCH a=83191
+7^13 = NO MATCH a=220102
+7^14 = NO MATCH a=582333
+7^15 = NO MATCH a=1540708
 
 
-/*
-define oni(x, y) {
-  local a, b, c, d, p1, p2, p, r, t1, t2;
-  local f1, f2;
-  p = x ^ y;
-
-  b = 2;
-  f1 = 1;
-  f2 = 1;
-  p1 = p - 8;
-
-  while (f2) {
-    p1 -= 2;
-    f1 = 1;
-    while (f1) {
-      a = iroot(p1, b);
-      if ((a ^ b) == p1) {
-        f1 = 0;
-        printf("a=%d\n", a);
-      } else {
-        p1 -= 2;
-        if (p1 == 1) {
-          return 0;
-        }
-      }
-    }
-        printf("%d %d\n", p1, (p1-t1));
-        t1 = p1;
-  }
-}
+71^2 = 2^7+17^3=71^2
+71^3 = 23^3+588^2=71^3
+71^4 = 136^3+4785^2=71^4
+71^5 = NO MATCH a=30036
+71^6 = NO MATCH a=253082
+71^7 = NO MATCH a=2132501
 
 
-    d = 3;
-    f1 = 1;
-    p2 = p - p1;
-
-    while (f1) {
-      c = iroot(p2, d);
-      if (c == 2) {
-        f1 = 0;
-      } else {
-        if ((c ^ d) == p2) {
-          r = p - (a ^ b) - (c ^ d);
-          if (r == 0) {
-            f2 = 0;
-            f1 = 0;
-          }
-
-        } else {
-          d++;
-        }
-      }
-    }
-
-    p1 -= 2;
-  }
-  printf("a^b=%d^%d=%d c^d=%d^%d=%d\n", a, b, p1, c, d, p2);
-
-  printf("∆=%d\n", r);
-  */
- 
-
-define oni(x, y) {
-  local a, b, c, d, p1, p2, p, r, t1, t2, m;
-  local f1, f2;
-  local maxPowerB, maxPowerD;
-
-  p = x ^ y;
-  m = p / 2;
-  maxPowerB = 3;
-  maxPowerD = 9;
-
-  p1 = m;
-  if (!isint(p1)) {
-    p1 = int(p1);
-  }
-
-  if (!iseven(y) && iseven(p1)) {
-    p1--;
-  }
-
-  p1 += 2;
-firstStage:
-  /* printf("First stage\n", p1);*/
-
-  do {
-    p1 -= 2;
-    /*printf("p1=%d\n", p1);*/
-    b = maxPowerB;
-    do {
-      a = iroot(p1, b);
-      if (a ^ b == p1) {
-        /* printf("a^b=p1\n", p1); */
-        goto secondStage; /* Successfull */
-      }
-
-      b--;
-      if (b < 2) {
-        /* printf("b<2\n", p1); */
-        break; /* Fail */
-      }
-
-    } while (1);
-  } while (1);
-
-secondStage:
-  p2 = p - p1;
-  printf("a^b=%d^%d=%d p2=%d\n", a, b, p1, p2);
-  /*  printf("2nd stage\n", p1);*/
-
-  d = maxPowerD;
-  do {
-    c = iroot(p2, d);
-    if (c ^ d == p2) {
-      goto success;
-    }
-
-    d--;
-    if (d < 2) {
-      goto firstStage;
-    }
-
-  } while (1);
-
-success:
-  printf("a^b=%d^%d=%d c^d=%d^%d=%d\n", a, b, p1, c, d, p2);
-
-exiting:
-  return 0;
-}
-
-define oni2(x, y, minb, maxb, mind, maxd) {
-  local a, b, c, d, p1, p2, p, r, t1, t2, m;
-  local f1, f2;
-  /* local maxb, maxd; */
-
-  p = x ^ y;
-  m = p / 2;
-
-  p1 = int(m);
-
-  if (!iseven(y) && iseven(p1)) {
-    p1--;
-  }
-
-  a = 1;
-
-stage1:
-  do {
-    a += 1;
-    if (a > m) {
-      goto exiting;
-    }
-    b = minb - 1;
-    printf("testing %d^%d+%d^%d\n", a, b + 1, c, d);
-    do {
-      b++;
-      if (b > maxb) {
-        goto stage1;
-      }
-
-      p1 = a ^ b;
-      p2 = p - p1;
-      d = mind;
-
-      if (p2 < 0) {
-        break;
-      }
-
-      if (p1 > m) {
-        break;
-      }
-
-      do {
-        c = iroot(p2, d);
-        if (c < 2) {
-          goto stage1;
-        }
-        if (c ^ d == p2) {
-
-          if (isint(a / x) || isint(c / x)) {
-            goto stage1;
-          }
-
-          goto success;
-        }
-        d++;
-        if (d > maxd) {
-          break;
-        }
-
-      } while (1);
-    } while (1);
-  } while (1);
-
-success:
-  /* printf("a^b=%d^%d=%d c^d=%d^%d=%d p1+p2=%d a^b+c^d=%d\n", a, b, p1, c, d,
-     p2, (p1 + p2), p);
-                  */
-  r = strprintf("%d^%d+%d^%d=%d^%d", a, b, c, d, x, y);
-  return r;
-
-exiting:
-  return "";
-}
+8191^1 = NO MATCH a=64
+8191^2 = NO MATCH a=5792
+8191^3 = NO MATCH a=524193
 
 
-define o1(x, y) {
-  local p, m, q;
-  local a, b;
-  local p1, p2, t, w;
-  p = x ^ y;
-  m = p / 2;
 
-  if (iseven(p)) {
-    w = 2;
-    q = m - 1;
-  } else {
-    w = 1;
-    q = int(m);
-  }
 
-  do {
-    for (b = 2; b < 5; b++) {
-      a = iroot(q, b);
-      if (a < 2) {
-        break;
-      }
-      p1 = a ^ b;
-      if (p1 == q) {
-        p2 = p - p1;
-        t = getRoot(p2);
-        if (t != "0") {
-          printf("%d^%d=%d %d %s\n", a, b, q, p2, t);
-          break;
-        }
-      }
-    }
-    q -= w;
-  } while (1);
-}
 
-define oni3(x, y, bMin, bMax, dMin, dMax) {
 
-  local p, m, p1, p2, d, t1, t2, r;
-  p = x ^ y;
-  m = p / 2;
 
-  if (iseven(m)) {
-    d = 2;
-    p1 = m - 1;
-  } else {
-    p1 = int(m);
-    d = 1;
-  }
-
-  while (p1 > 1) {
-    t1 = getRoot(p1, bMin, bMax);
-    if (t1 != "0") {
-      p2 = p - p1;
-      t2 = getRoot(p2, dMin, dMax);
-      if (t2 != "0") {
-        r = strprintf("%s + %s", t1, t2);
-        return r;
-      }
-    }
-    p1 -= d;
-  }
-}
