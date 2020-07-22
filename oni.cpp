@@ -143,6 +143,7 @@ void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
                 string &result, int &threadSum) {
   unsigned int a, b;
   mpz_class p1, p2, p, m;
+  kdTimer kdtimer;
 
   mpz_ui_pow_ui(p.get_mpz_t(), x, y);
   m = p / 2;
@@ -150,7 +151,7 @@ void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
   a = 2;
   b = bMin;
 
-  // printf("Start %d\n", id);
+  kdtimer.start();
   do {
     do {
       mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
@@ -162,7 +163,8 @@ void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
         if (mpz_perfect_power_p(p2.get_mpz_t()) != 0) {
           if (mpz_divisible_ui_p(p1.get_mpz_t(), x) == 0) {
             char s[127];
-            sprintf(s, "%d^%d = %d^%d + %s", x, y, a, b, findPower(p2).c_str());
+            sprintf(s, "%d^%d = %d^%d + %s. Time:%.4f", x, y, a, b,
+                    findPower(p2).c_str(), kdtimer.stop());
             result = string(s);
             goto oni_worker_exit;
           }
@@ -184,7 +186,6 @@ oni_worker_exit:
 
 void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
                 int threadsQuantity) {
-  // unsigned int threadsQuantity = thread::hardware_concurrency();
   int threadSum = 0;
   unsigned int i;
   mpz_class p, m, r, max, min;
@@ -195,21 +196,43 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
   m = p / 2;
   r = m / threadsQuantity;
 
+  // Left side
   for (i = 0; i < threadsQuantity; i++) {
     min = i * r;
     max = min + r;
-
     threads.push_back(thread(oni_worker, x, y, min, max, bMin, i, ref(result),
                              ref(threadSum)));
   }
 
-  while (threadSum < threadsQuantity) {
+  // Right side
+  for (i = 0; i < threadsQuantity; i++) {
+    min = (i * r) + m;
+    max = min + r;
+    threads.push_back(thread(oni_worker, x, y, min, max, bMin, i, ref(result),
+                             ref(threadSum)));
+  }
+
+  while (threadSum < (2 * threadsQuantity)) {
   };
 
-  for (i = 0; i < threadsQuantity; i++) {
-    if (threads[i].joinable()) {
-      threads[i].detach();
+  for (thread &t : threads) {
+    if (t.joinable()) {
+      t.detach();
     }
+  }
+
+  /*
+    for (i = 0; i < threadsQuantity; i++) {
+      if (threads[i].joinable()) {
+        threads[i].detach();
+      }
+    }
+    */
+
+  if (result.length() == 0) {
+    char s[127];
+    sprintf(s, "%d^%d not match.", x, y);
+    result = string(s);
   }
 
   printf("%s\n", result.c_str());
