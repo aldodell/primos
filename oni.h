@@ -43,3 +43,26 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
 void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity);
 
 #endif
+
+"label": "Build ONI with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                //"-DPRIME_TESTER_LIB=lib",
+                // "-DBIG_GEARS_FACTORIZER_LIB",
+                "-DBIG_HALF_GEAR_FACTORIZER_LIB",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                //"maths_prime.cpp",
+                // "primeTester.cpp",
+                "bigFactorObject.cpp",
+                // "bigGearsFactorizer.cpp",
+                "bigHalfGearFactorizer.cpp",
+                "oni.cpp",
+                "-o",
+                "oni.out",
+                "--debug"
