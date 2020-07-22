@@ -118,12 +118,118 @@ void oni_test2(int a, int b) {
   }
 }
 
+string findPower(mpz_class n) {
+  mpz_class p, e, b;
+
+  b = 2;
+  do {
+    p = 1;
+    e = 0;
+    while (p < n) {
+      p *= b;
+      e++;
+      if (p == n) {
+        char s[32];
+        sprintf(s, "%lu^%lu", b.get_ui(), e.get_ui());
+        return string(s);
+      }
+    }
+    b++;
+  } while ((b * b) <= n);
+  return "";
+}
+
+void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
+                string &result, int &threadSum) {
+  unsigned int a, b;
+  mpz_class p1, p2, p, m;
+
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  m = p / 2;
+
+  a = 2;
+  b = bMin;
+
+  // printf("Start %d\n", id);
+  do {
+    do {
+      mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
+      if (p1 >= min) {
+        if (p1 > max) {
+          break;
+        }
+        p2 = p - p1;
+        if (mpz_perfect_power_p(p2.get_mpz_t()) != 0) {
+          if (mpz_divisible_ui_p(p1.get_mpz_t(), x) == 0) {
+            char s[127];
+            sprintf(s, "%d^%d = %d^%d + %s", x, y, a, b, findPower(p2).c_str());
+            result = string(s);
+            goto oni_worker_exit;
+          }
+        }
+      }
+      b++;
+    } while (true);
+    a++;
+    b = bMin;
+    mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
+    if (p1 > max) {
+      break;
+    }
+  } while (true);
+oni_worker_exit:
+  threadSum++;
+  return;
+}
+
+void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
+                int threadsQuantity) {
+  // unsigned int threadsQuantity = thread::hardware_concurrency();
+  int threadSum = 0;
+  unsigned int i;
+  mpz_class p, m, r, max, min;
+  vector<thread> threads;
+  string result = "";
+
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  m = p / 2;
+  r = m / threadsQuantity;
+
+  for (i = 0; i < threadsQuantity; i++) {
+    min = i * r;
+    max = min + r;
+
+    threads.push_back(thread(oni_worker, x, y, min, max, bMin, i, ref(result),
+                             ref(threadSum)));
+  }
+
+  while (threadSum < threadsQuantity) {
+  };
+
+  for (i = 0; i < threadsQuantity; i++) {
+    if (threads[i].joinable()) {
+      threads[i].detach();
+    }
+  }
+
+  printf("%s\n", result.c_str());
+}
+
+void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity) {
+
+  unsigned int y = 0;
+  while (y < 128) {
+    y++;
+    oni_finder(x, y, bMin, threadsQuantity);
+  }
+}
+
 int main(int argc, char *argv[]) {
   argumentsHandler argHdl(argc, argv);
 
   int debugLevel;
   int action;
-  mpz_class a, b;
+  mpz_class a, b, c, d;
 
   argHdl.add(argument(0, (char *)"z", (char *)"debug", (char *)"Debug level",
                       (char *)"N"));
@@ -147,6 +253,22 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(6, (char *)"f", (char *)"experiment2",
                       (char *)"P ends at 7 are 2M-1 divisible by 11",
                       (char *)"N"));
+
+  argHdl.add(argument(7, (char *)"g", (char *)"Find power x^y of a",
+                      (char *)"n", (char *)"N"));
+
+  argHdl.add(argument(8, (char *)"c", (char *)"C", (char *)"c parameter",
+                      (char *)"N"));
+
+  argHdl.add(argument(9, (char *)"d", (char *)"D", (char *)"d parameter",
+                      (char *)"N"));
+
+  argHdl.add(argument(10, (char *)"h",
+                      (char *)"Thread pool ONI finder x^y, y min", (char *)"n",
+                      (char *)"N"));
+
+  argHdl.add(argument(11, (char *)"i", (char *)"Loop  ONI finder x^y",
+                      (char *)"n", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -179,6 +301,27 @@ int main(int argc, char *argv[]) {
 
     case 6:
       oni_test2(a.get_ui(), b.get_ui());
+      break;
+
+    case 7:
+      gmp_printf("%Zd\n", a.get_mpz_t());
+      printf("%s\n", findPower(a).c_str());
+      break;
+
+    case 8:
+      c = argHdl.value;
+      break;
+
+    case 9:
+      d = argHdl.value;
+      break;
+
+    case 10:
+      oni_finder(a.get_ui(), b.get_ui(), c.get_ui(), d.get_ui());
+      break;
+
+    case 11:
+      oni_loop(a.get_ui(), b.get_ui(), c.get_ui());
       break;
     }
   }

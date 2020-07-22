@@ -12,7 +12,6 @@
 #include <gmpxx.h>
 #include <thread>
 
-
 vector<unsigned int> mersenneExponents{
     2,        3,        5,        7,        13,       17,       19,
     31,       61,       89,       107,      127,      521,      607,
@@ -26,6 +25,21 @@ vector<unsigned int> mersenneExponents{
 /* Return basic ONI operation. Adding odd numbers from a to b inclusive*/
 mpz_class oni_sum(mpz_class a, mpz_class b);
 void oni_primarity(mpz_class z);
-void oni_test1(unsigned int a=0, unsigned int b=10);
+void oni_test1(unsigned int a = 0, unsigned int b = 10);
+string findPower(mpz_class n);
+
+/*
+void oni_wt(mpz_class x, mpz_class y, mpz_class aMin, mpz_class aMax,
+            mpz_class bMin, mpz_class bMax, string &result, int id, int &flag);
+void oni_n(int base, int exponent, mpz_class minB, mpz_class maxB);
+*/
+
+void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
+                string &result, int &threadSum);
+
+void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
+                int threadsQuantity = 4);
+
+void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity);
 
 #endif

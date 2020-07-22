@@ -212,3 +212,37 @@ define onix(minx, maxx, miny, maxy, minb, maxb, mind, maxd) {
     }
   }
 }
+
+/**
+ * Is m a power o n?
+ */
+define isPower(n, m) {
+  local p;
+  p = 1;
+  if (n == 1) {
+    return (m == 1);
+  }
+  while (p < m) {
+    p *= n;
+  }
+  return (p == m);
+}
+
+define powerForm(n) {
+  local p;
+  local e, b;
+  b = 2;
+  do {
+    p = 1;
+    e = 0;
+    while (p < n) {
+      p *= b;
+      e++;
+    }
+    if (p == n) {
+      return strprintf("%d^%d", b, e);
+    }
+    b++;
+  } while (b ^ 2 <= n);
+  return 0;
+}
