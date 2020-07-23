@@ -42,4 +42,11 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
 
 void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity);
 
+/*
+Compiler:
+clang++ -std=c++1z -stdlib=libc++ -lgmpxx -lgmp -DBIG_HALF_GEAR_FACTORIZER_LIB
+kdutils.cpp argumentsHandler.cpp bigFactorObject.cpp bigHalfGearFactorizer.cpp
+oni.cpp -o oni.out --debug
+*/
+
 #endif

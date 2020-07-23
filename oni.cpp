@@ -252,10 +252,11 @@ int main(int argc, char *argv[]) {
 
   int debugLevel;
   int action;
+  int bMin, x, y, threads;
   mpz_class a, b, c, d;
 
-  argHdl.add(argument(0, (char *)"z", (char *)"debug", (char *)"Debug level",
-                      (char *)"N"));
+  argHdl.add(argument(0, (char *)"debug", (char *)"debug",
+                      (char *)"Debug level", (char *)"N"));
 
   argHdl.add(argument(1, (char *)"a", (char *)"A", (char *)"a parameter",
                       (char *)"N"));
@@ -263,35 +264,30 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(2, (char *)"b", (char *)"B", (char *)"b parameter",
                       (char *)"N"));
 
-  argHdl.add(argument(3, (char *)"s", (char *)"sum",
-                      (char *)"ONI sum from a to b", (char *)"N"));
-
-  argHdl.add(argument(4, (char *)"p", (char *)"primarity",
-                      (char *)"Primarity test of 'a' param.", (char *)"N"));
-
-  argHdl.add(argument(5, (char *)"e", (char *)"experiment1",
-                      (char *)"Take last term o ONI on Mersenne N",
+  argHdl.add(argument(3, (char *)"c", (char *)"C", (char *)"c parameter",
                       (char *)"N"));
 
-  argHdl.add(argument(6, (char *)"f", (char *)"experiment2",
-                      (char *)"P ends at 7 are 2M-1 divisible by 11",
+  argHdl.add(argument(4, (char *)"d", (char *)"D", (char *)"d parameter",
                       (char *)"N"));
 
-  argHdl.add(argument(7, (char *)"g", (char *)"Find power x^y of a",
-                      (char *)"n", (char *)"N"));
+  argHdl.add(argument(5, (char *)"bmin", (char *)"bMin",
+                      (char *)"Minimun b on a^b", (char *)"N"));
 
-  argHdl.add(argument(8, (char *)"c", (char *)"C", (char *)"c parameter",
+  argHdl.add(
+      argument(6, (char *)"x", (char *)"X", (char *)"x  on x^y", (char *)"N"));
+
+  argHdl.add(
+      argument(7, (char *)"y", (char *)"Y", (char *)"y  on x^y", (char *)"N"));
+
+  argHdl.add(argument(8, (char *)"threads", (char *)"THREADS",
+                      (char *)"Threads quantity", (char *)"N"));
+
+  argHdl.add(argument(9, (char *)"finder", (char *)"FINDER",
+                      (char *)"ONI finder: x,y,bmin,threads", (char *)"N"));
+
+  argHdl.add(argument(10, (char *)"loop", (char *)"LOOP",
+                      (char *)"ONI finder looping: x, bmin,threads",
                       (char *)"N"));
-
-  argHdl.add(argument(9, (char *)"d", (char *)"D", (char *)"d parameter",
-                      (char *)"N"));
-
-  argHdl.add(argument(10, (char *)"h",
-                      (char *)"Thread pool ONI finder x^y, y min", (char *)"n",
-                      (char *)"N"));
-
-  argHdl.add(argument(11, (char *)"i", (char *)"Loop  ONI finder x^y",
-                      (char *)"n", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -311,43 +307,36 @@ int main(int argc, char *argv[]) {
       break;
 
     case 3:
-      gmp_printf("%Zd\n", oni_sum(a, b).get_mpz_t());
-      break;
-
-    case 4:
-      oni_primarity(a);
-      break;
-
-    case 5:
-      oni_test1(a.get_ui(), b.get_ui());
-      break;
-
-    case 6:
-      oni_test2(a.get_ui(), b.get_ui());
-      break;
-
-    case 7:
-      gmp_printf("%Zd\n", a.get_mpz_t());
-      printf("%s\n", findPower(a).c_str());
-      break;
-
-    case 8:
       c = argHdl.value;
       break;
 
-    case 9:
+    case 4:
       d = argHdl.value;
       break;
 
-    case 10:
-      oni_finder(a.get_ui(), b.get_ui(), c.get_ui(), d.get_ui());
+    case 5:
+      argHdl.pvalue(&bMin);
       break;
 
-    case 11:
-      oni_loop(a.get_ui(), b.get_ui(), c.get_ui());
+    case 6:
+      argHdl.pvalue(&x);
       break;
+
+    case 7:
+      argHdl.pvalue(&y);
+      break;
+
+    case 8:
+      argHdl.pvalue(&threads);
+      break;
+
+    case 9:
+      oni_finder(x, y, bMin, threads);
+      break;
+
+    case 10:
+      oni_loop(x, bMin, threads);
     }
   }
-
   exit(0);
 }
