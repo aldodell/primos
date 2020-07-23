@@ -26,7 +26,9 @@ vector<unsigned int> mersenneExponents{
 mpz_class oni_sum(mpz_class a, mpz_class b);
 void oni_primarity(mpz_class z);
 void oni_test1(unsigned int a = 0, unsigned int b = 10);
+// string findPower(mpz_class n, mpz_class &x, mpz_class &y);
 string findPower(mpz_class n);
+void findPower(mpz_class n, int &x, int &y);
 
 /*
 void oni_wt(mpz_class x, mpz_class y, mpz_class aMin, mpz_class aMax,
@@ -42,9 +44,16 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
 
 void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity);
 
+void oni_worker_2(int x, int y, mpz_class min, mpz_class max, int id,
+                  string &result, int &threadSum);
+
+void oni_finder_2(unsigned int x, unsigned int y, int threadsQuantity = 4);
+
 /*
 Compiler:
-clang++ -std=c++1z -stdlib=libc++ -lgmpxx -lgmp -pthread -DBIG_HALF_GEAR_FACTORIZER_LIB kdutils.cpp argumentsHandler.cpp bigFactorObject.cpp bigHalfGearFactorizer.cpp oni.cpp -o oni.out --debug
+clang++ -std=c++1z -stdlib=libc++ -lgmpxx -lgmp -pthread
+-DBIG_HALF_GEAR_FACTORIZER_LIB kdutils.cpp argumentsHandler.cpp
+bigFactorObject.cpp bigHalfGearFactorizer.cpp oni.cpp -o oni.out --debug
 */
 
 #endif

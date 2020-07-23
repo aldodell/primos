@@ -119,6 +119,7 @@ void oni_test2(int a, int b) {
 }
 
 string findPower(mpz_class n) {
+  //, mpz_class &x, mpz_class &y
   mpz_class p, e, b;
 
   b = 2;
@@ -131,12 +132,35 @@ string findPower(mpz_class n) {
       if (p == n) {
         char s[32];
         sprintf(s, "%lu^%lu", b.get_ui(), e.get_ui());
+        //  x = b;
+        //  y = e;
         return string(s);
       }
     }
     b++;
   } while ((b * b) <= n);
   return "";
+}
+
+void findPower(mpz_class n, mpz_class &x, mpz_class &y) {
+  mpz_class p, e, b;
+
+  b = 2;
+  do {
+    p = 1;
+    e = 0;
+    while (p < n) {
+      p *= b;
+      e++;
+      if (p == n) {
+        x = b;
+        y = e;
+        return;
+      }
+    }
+    b++;
+  } while ((b * b) <= n);
+  return;
 }
 
 void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
@@ -221,14 +245,6 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
     }
   }
 
-  /*
-    for (i = 0; i < threadsQuantity; i++) {
-      if (threads[i].joinable()) {
-        threads[i].detach();
-      }
-    }
-    */
-
   if (result.length() == 0) {
     char s[127];
     sprintf(s, "%d^%d not match.", x, y);
@@ -245,6 +261,85 @@ void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity) {
     y++;
     oni_finder(x, y, bMin, threadsQuantity);
   }
+}
+
+void oni_worker_2(int x, int y, mpz_class min, mpz_class max, int id,
+                  string &result, int &threadSum) {
+
+  mpz_class p, p1, p2, m, gcd;
+  mpz_class a, b, c, d;
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  m = p / 2;
+  string l, r, R;
+  kdTimer timer;
+
+  timer.start();
+  for (p1 = max; p1 >= min; p1--) {
+    if (mpz_perfect_power_p(p1.get_mpz_t()) != 0) {
+      p2 = p - p1;
+      if (mpz_perfect_power_p(p2.get_mpz_t()) != 0) {
+        findPower(p1, a, b);
+        findPower(p2, c, d);
+        mpz_gcd(gcd.get_mpz_t(), a.get_mpz_t(), c.get_mpz_t());
+        if (gcd < 2) {
+          char s[32];
+          gmp_sprintf(s, "%d^%d = %Zd^%Zd + %Zd^%Zd. Time=%.3f", x, y,
+                      a.get_mpz_t(), b.get_mpz_t(), c.get_mpz_t(),
+                      d.get_mpz_t(), timer.stop());
+          result = string(s);
+          goto oni_worker_2_exit;
+        }
+      }
+    }
+  }
+oni_worker_2_exit:
+  threadSum++;
+  return;
+}
+
+void oni_finder_2(unsigned int x, unsigned int y, int threadsQuantity) {
+  int threadSum = 0;
+  unsigned int i;
+  mpz_class p, m, r, max, min;
+  vector<thread> threads;
+  string result = "";
+
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  m = p / 2;
+  r = m / threadsQuantity;
+
+  // Left side
+  for (i = 0; i < threadsQuantity; i++) {
+    min = i * r;
+    max = min + r;
+    threads.push_back(
+        thread(oni_worker_2, x, y, min, max, i, ref(result), ref(threadSum)));
+  }
+
+  // Right side
+  for (i = 0; i < threadsQuantity; i++) {
+    min = (i * r) + m;
+    max = min + r;
+    threads.push_back(
+        thread(oni_worker_2, x, y, min, max, i, ref(result), ref(threadSum)));
+  }
+
+  while (threadSum < (2 * threadsQuantity)) {
+  };
+
+  for (thread &t : threads) {
+    if (t.joinable()) {
+      t.detach();
+    }
+  }
+
+  if (result.length() == 0) {
+    char s[127];
+    sprintf(s, "%d^%d not match.", x, y);
+    result = string(s);
+  }
+
+  printf("%s\n", result.c_str());
 }
 
 int main(int argc, char *argv[]) {
@@ -288,6 +383,9 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(10, (char *)"loop", (char *)"LOOP",
                       (char *)"ONI finder looping: x, bmin,threads",
                       (char *)"N"));
+
+  argHdl.add(argument(11, (char *)"finder2", (char *)"FINDER2",
+                      (char *)"ONI finder: x,y,threads", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -336,6 +434,11 @@ int main(int argc, char *argv[]) {
 
     case 10:
       oni_loop(x, bMin, threads);
+      break;
+
+    case 11:
+      oni_finder_2(x, y, threads);
+      break;
     }
   }
   exit(0);
