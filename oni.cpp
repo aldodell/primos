@@ -165,6 +165,50 @@ void findPower(mpz_class n, mpz_class &x, mpz_class &y) {
 
 void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
                 string &result, int &threadSum) {
+  int a, b, c, d;
+  mpz_class p1, p2, p, border;
+  kdTimer kdtimer;
+
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  mpz_root(border.get_mpz_t(), max.get_mpz_t(), bMin);
+  kdtimer.start();
+  a = 2;
+  do {
+    b = bMin;
+    do {
+      mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
+      if (p1 > max) {
+        break;
+      }
+      if (p1 >= min) {
+        p2 = p - p1;
+        if (mpz_perfect_power_p(p2.get_mpz_t())) {
+          findPower(p2, &c, &d);
+          if (!(a % c == 0 || c % a == 0)) {
+            char s[127];
+            sprintf(s, "%d^%d = %d^%d + %d^%d. Time:%.4f", x, y, a, b, c, d,
+                    kdtimer.stop());
+            result = string(s);
+            goto oni_worker_exit;
+          }
+        }
+      }
+      b++;
+    } while (true);
+    a++;
+    if (a > border) {
+      break;
+    }
+  } while (true);
+
+oni_worker_exit:
+  threadSum++;
+  return;
+}
+
+/*
+void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
+                string &result, int &threadSum) {
   unsigned int a, b;
   mpz_class p1, p2, p, m;
   kdTimer kdtimer;
@@ -206,7 +250,7 @@ void oni_worker(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
 oni_worker_exit:
   threadSum++;
   return;
-}
+*/
 
 void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
                 int threadsQuantity) {
@@ -274,7 +318,7 @@ void oni_worker_2(int x, int y, mpz_class min, mpz_class max, int id,
   kdTimer timer;
 
   timer.start();
-  for (p1 = max; p1 >= min; p1--) {
+  for (p1 = min; p1 <= max; p1++) {
     if (mpz_perfect_power_p(p1.get_mpz_t()) != 0) {
       p2 = p - p1;
       if (mpz_perfect_power_p(p2.get_mpz_t()) != 0) {
