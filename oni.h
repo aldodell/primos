@@ -28,6 +28,7 @@ void oni_primarity(mpz_class z);
 void oni_test1(unsigned int a = 0, unsigned int b = 10);
 // string findPower(mpz_class n, mpz_class &x, mpz_class &y);
 string findPower(mpz_class n);
+void findPower(mpz_class n, mpz_class &x, mpz_class &y);
 void findPower(mpz_class n, int &x, int &y);
 
 /*

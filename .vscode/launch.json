@@ -195,10 +195,11 @@
             "terminal": "console",
             "program": "${workspaceRoot}/oni.out",
             "args": [
-                "-x:5",
-                "-y:3",
+                "-x:3",
+                "-y:4",
+                "-bmin:2",
                 "-threads:2",
-                "-finder2"
+                "-finder3"
             ]
         }
     ]
