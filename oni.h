@@ -29,8 +29,9 @@ void oni_test1(unsigned int a = 0, unsigned int b = 10);
 // string findPower(mpz_class n, mpz_class &x, mpz_class &y);
 string findPower(mpz_class n);
 void findPower(mpz_class n, mpz_class &x, mpz_class &y);
-void findPower(mpz_class n, int &x, int &y);
+inline void findPower(mpz_class n, int &x, int &y);
 
+inline int mygcd(int a, int b);
 /*
 void oni_wt(mpz_class x, mpz_class y, mpz_class aMin, mpz_class aMax,
             mpz_class bMin, mpz_class bMax, string &result, int id, int &flag);
@@ -47,8 +48,14 @@ void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity);
 
 void oni_worker_2(int x, int y, mpz_class min, mpz_class max, int id,
                   string &result, int &threadSum);
+void oni_worker_3(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
+                  string &result, int &threadSum);
+void oni_worker_3b(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
+                   string &result, int &threadSum);
 
 void oni_finder_2(unsigned int x, unsigned int y, int threadsQuantity = 4);
+void oni_finder_3(unsigned int x, unsigned int y, unsigned int bmin,
+                  int threadsQuantity = 4);
 
 /*
 Compiler:

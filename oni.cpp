@@ -4,6 +4,12 @@
 
 #include "oni.h"
 
+inline int mygcd(int a, int b) {
+  if (b == 0)
+    return a;
+  return mygcd(b, a % b);
+}
+
 mpz_class oni_sum(mpz_class a, mpz_class b) {
   mpz_class i; // counter
   mpz_class s; // sum
@@ -132,8 +138,6 @@ string findPower(mpz_class n) {
       if (p == n) {
         char s[32];
         sprintf(s, "%lu^%lu", b.get_ui(), e.get_ui());
-        //  x = b;
-        //  y = e;
         return string(s);
       }
     }
@@ -163,10 +167,8 @@ void findPower(mpz_class n, mpz_class &x, mpz_class &y) {
   return;
 }
 
-void findPower(mpz_class n, int &x, int &y) {
-  mpz_class p, e, b;
-
-  b = 2;
+inline void findPower(mpz_class n, int &x, int &y) {
+  mpz_class p, e, b, b2;
   do {
     p = 1;
     e = 0;
@@ -230,7 +232,7 @@ oni_worker_exit:
 void oni_worker_3b(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
                    string &result, int &threadSum) {
   int a, b, c, d, aMin;
-  mpz_class p1, p2, p;
+  mpz_class p1, p2, p, t;
   kdTimer kdtimer;
 
   mpz_ui_pow_ui(p.get_mpz_t(), x, y);
@@ -242,6 +244,9 @@ void oni_worker_3b(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
 
   do {
     do {
+      if (result != "") {
+        goto l1;
+      }
       mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
       if (p1 > max) {
         if (a == aMin) {
@@ -253,12 +258,15 @@ void oni_worker_3b(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
       if (p1 >= min) {
         p2 = p - p1;
         if (mpz_perfect_power_p(p2.get_mpz_t()) != 0) {
-          if (mpz_divisible_ui_p(p1.get_mpz_t(), x) == 0) {
-            char s[127];
-            sprintf(s, "%d^%d = %d^%d + %s. Time:%.4f", x, y, a, b,
-                    findPower(p2).c_str(), kdtimer.stop());
-            result = string(s);
-            goto l1;
+          if (mygcd(a, x) == 1) {
+            findPower(p2, c, d);
+            if (mygcd(a, c) == 1) {
+              char s[127];
+              sprintf(s, "%d^%d = %d^%d + %d^%d . Time:%.4f", x, y, a, b, c, d,
+                      kdtimer.stop());
+              result = string(s);
+              goto l1;
+            }
           }
         }
       }
@@ -268,8 +276,59 @@ void oni_worker_3b(int x, int y, mpz_class min, mpz_class max, int bMin, int id,
     b++;
   } while (true);
 l1:
-  gmp_printf("Closing thread %d, min=%Zd, max=%Zd\n", threadSum, min.get_mpz_t(),
-             max.get_mpz_t());
+  //  gmp_printf("Closing thread %d, min=%Zd, max=%Zd\n", threadSum,
+  //  min.get_mpz_t(),
+  //             max.get_mpz_t());
+  threadSum++;
+  return;
+}
+
+/***
+ * Este modelo inicia con 2^2 y recorre 3^2, 4^2, 5^2 y así...
+ * hasta que se consiga una potencia del lado derecho
+ * o que la potencia del lado izquiero sea mayor al centro
+ * */
+void oni_worker_4(int x, int y, int e, string &result, int &threadSum) {
+  mpz_class p, m, p1, p2;
+  int a, b, c, d;
+  kdTimer timer;
+
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y); // Initial power
+  m = p / 2;                          // ONI's middle.
+
+  p1 = 0;
+  p2 = 0;
+  a = 2;
+  b = 2;
+  c = 0;
+  d = 0;
+
+  timer.start();
+  while (true) {
+    while (true) {
+      mpz_ui_pow_ui(p1.get_mpz_t(), a, b);
+      if (p1 > m) {
+        if (a == 2) {
+          goto exit;
+        } else {
+          break;
+        }
+      }
+      p2 = p - p1;
+      findPower(p2, c, d);
+      if (c > 0) {
+        char s[127];
+        sprintf(s, "%d^%d = %d^%d + %d^%d. Time:%.4f", x, y, a, b, c, d,
+                timer.stop());
+        result = string(s);
+        goto exit;
+      }
+      a++;
+    }
+    a = 2;
+    b++;
+  }
+exit:
   threadSum++;
   return;
 }
@@ -366,11 +425,11 @@ void oni_finder(unsigned int x, unsigned int y, unsigned int bMin,
 }
 
 void oni_loop(unsigned int x, unsigned int bMin, int threadsQuantity) {
-
   unsigned int y = 0;
   while (y < 128) {
     y++;
-    oni_finder(x, y, bMin, threadsQuantity);
+    oni_finder_3(x, y, bMin, threadsQuantity);
+    this_thread::yield();
   }
 }
 
@@ -481,14 +540,13 @@ void oni_finder_3(unsigned int x, unsigned int y, unsigned int bMin,
                              ref(result), ref(threadSum)));
   }
 
-  while (threadSum < (2 * threadsQuantity)) {
-    if (result != "")
-      break;
+  while (result == "" && threadSum < (2 * threadsQuantity)) {
+    this_thread::yield();
   };
 
   for (thread &t : threads) {
     if (t.joinable()) {
-      t.detach();
+      t.join();
     }
   }
 
@@ -499,6 +557,196 @@ void oni_finder_3(unsigned int x, unsigned int y, unsigned int bMin,
   }
 
   printf("%s\n", result.c_str());
+}
+
+/*
+void printPlaintext(mpz_t plaintext) {
+   size_t count = 1024;
+   char *buffer = (char *)calloc(count, sizeof(char));
+
+   mpz_export((void*)buffer, &count, 1, sizeof( char), 1, 0, plaintext);
+   printf("%s\n", buffer);
+}
+
+
+cstring *bn_getvch(const mpz_t v)
+{
+
+        size_t sz;
+        char *buf = mpz_export(NULL, &sz, -1, 1, 1, 0, v);
+
+*/
+
+/*
+struct PowerData {
+  char x, y;
+  char buffer[16] = {0};
+
+  PowerData(unsigned int x, unsigned int y, mpz_class p) {
+    this->x = x;
+    this->y = y;
+    // void * mpz_export (void *rop, size_t *countp, int order, size_t size, int
+    // endian, size_t nails, const mpz_t op)
+    size_t size;
+
+    void *buf = mpz_export(NULL,  // rop
+                           &size, // size_t countp
+                           1,     // order
+                           1,     // size_t size
+                           1,     // endian
+                           0,     // size_t nails
+                           p.get_mpz_t());
+
+    memcpy(this->buffer, buf, size);
+    free(buf);
+  }
+};
+*/
+
+/*
+void write(const std::string& file_name, s& data)
+{
+  std::ofstream out(file_name.c_str());
+  out.write(reinterpret_cast<char*>(&s), sizeof(s));
+}
+
+void read(const std::string& file_name, s& data)
+{
+  std::ifstream in(file_name.c_str());
+  in.read(reinterpret_cast<char*>(&s), sizeof(s));
+}
+*/
+
+struct PowerData {
+  unsigned char x;
+  unsigned char y;
+  mpz_class p;
+  PowerData(unsigned int x, unsigned int y, mpz_class p) {
+    this->p = p;
+    this->x = x;
+    this->y = y;
+  }
+  bool operator<(const PowerData &pd) const { return (this->p < pd.p); }
+  static PowerData empty() {
+    PowerData pd(0, 0, 0);
+    return pd;
+  }
+};
+
+struct OniMatch {
+  // o = p1 + p2 = x^y = a^b + c^d
+  PowerData p1 = PowerData::empty(); // Left side
+  PowerData p2 = PowerData::empty(); // Right side
+  PowerData o = PowerData::empty();  // Origin
+
+  static OniMatch empty() {
+    return OniMatch(PowerData::empty(), PowerData::empty(), PowerData::empty());
+  };
+
+  OniMatch() {
+    this->o = PowerData::empty();
+    this->p1 = PowerData::empty();
+    this->p2 = PowerData::empty();
+  }
+
+  OniMatch(PowerData o, PowerData p1, PowerData p2) {
+    this->o = o;
+    this->p1 = p1;
+    this->p2 = p2;
+  }
+};
+
+void buildPowerData(unsigned int a, unsigned int b) {
+  string file_name = "power-data.bin";
+  vector<PowerData> powers;
+  mpz_class p, limit;
+  int x, y, i;
+  mpz_ui_pow_ui(limit.get_mpz_t(), a, b);
+
+  x = 2;
+  y = 2;
+  i = 0;
+
+  do {
+    do {
+      mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+      if (p > limit) {
+        if (y == 2) {
+          goto finish;
+        }
+        break;
+      }
+
+      if (mpz_perfect_power_p(mpz_class(x).get_mpz_t()) == 0) {
+        powers.emplace_back(x, y, p);
+        //        gmp_printf("%d ^ %d = %Zd\n", x, y, p.get_mpz_t());
+        i++;
+      }
+      y++;
+
+    } while (true);
+    y = 2;
+    x++;
+  } while (true);
+finish:
+  printf("Count=%d\nSorting vector... \n", i);
+
+  // Sort powers by results
+  sort(powers.begin(), powers.end());
+
+  printf("Saving file... \n");
+
+  size_t sz;
+  void *buf;
+  ofstream out(file_name.c_str());
+  for (PowerData pd : powers) {
+
+    // Convert
+    mpz_export(buf, // rop
+               &sz, // size_t countp
+               1,   // order
+               1,   // size_t size
+               1,   // endian
+               0,   // size_t nails
+               pd.p.get_mpz_t());
+
+    // Write x and y on x^y
+    // char pdx[1] = {(char)pd.x};
+    out.write(reinterpret_cast<char *>(&pd.x), 1);
+    out.write(reinterpret_cast<char *>(&pd.y), 1);
+
+    // write size:
+    out.write(reinterpret_cast<char *>(&sz), 1);
+    // Write representation:
+    out.write(reinterpret_cast<char *>(&buf), sz);
+  }
+  out.flush();
+  out.close();
+
+  return;
+}
+
+OniMatch searchONIByPowerData(unsigned int x, unsigned int y,
+                              vector<PowerData> &data) {
+  mpz_class p, p1, p2, m;
+  mpz_ui_pow_ui(p.get_mpz_t(), x, y);
+  m = p / 2;
+
+  for (PowerData &pd : data) {
+    if (pd.p > m) {
+      break;
+    }
+
+    p1 = pd.p;
+    p2 = p - p1;
+
+    for (PowerData &pdx : data) {
+      if (pdx.p == p2) {
+        return OniMatch(PowerData(x, y, p), pd, pdx);
+      }
+    };
+  }
+  return OniMatch::empty();
 }
 
 int main(int argc, char *argv[]) {
@@ -548,6 +796,9 @@ int main(int argc, char *argv[]) {
 
   argHdl.add(argument(12, (char *)"finder3", (char *)"FINDER3",
                       (char *)"ONI finder: x,y,bmin,threads", (char *)"N"));
+
+  argHdl.add(argument(13, (char *)"powerbuild", (char *)"POWERBUILD",
+                      (char *)"limit: x^y", (char *)"N"));
 
   while (action > -1) {
     action = argHdl.getAction();
@@ -604,6 +855,10 @@ int main(int argc, char *argv[]) {
 
     case 12:
       oni_finder_3(x, y, bMin, threads);
+      break;
+
+    case 13:
+      buildPowerData((unsigned int)x, (unsigned int)y);
       break;
     }
   }

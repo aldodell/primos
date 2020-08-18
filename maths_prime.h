@@ -14,4 +14,5 @@ void operatorTest();
 bool isOdd(int n);
 int64 factorial(int64 n);
 mpz_class doubleFactorial(mpz_class n);
+
 #endif

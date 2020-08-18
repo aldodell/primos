@@ -149,3 +149,4 @@ mpz_class doubleFactorial(mpz_class n) {
     return n * doubleFactorial(n - 2);
   }
 }
+
