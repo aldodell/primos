@@ -484,6 +484,10 @@ int main(int argc, char *argv[]) {
   argHdl.add(argument(3, (char *)"f", (char *)"factorizer",
                       (char *)"factorizer n", (char *)"N"));
 
+
+ 
+
+
   int action = 0;
   while (action > -1) {
     action = argHdl.getAction();
@@ -508,6 +512,11 @@ int main(int argc, char *argv[]) {
 
     if (command < 0)
       exit(0);
+
+
+
+
+
   }
 
   primeTester pt(debugLevel);

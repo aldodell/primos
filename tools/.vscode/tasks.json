@@ -1,0 +1,51 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build factors32",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "../kdutils.cpp",
+                "factors32.cpp",
+                "-o",
+                "factors32.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "conjetura1",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                "../kdutils.cpp",
+                "conjetura1.cpp",
+                "-o",
+                "conjetura1.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        }
+    ]
+}

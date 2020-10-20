@@ -381,7 +381,6 @@ int main(int argc, char *argv[]) {
       kt.start();
       gf.findMersenne(n);
       cout << gf.toString() << " (" << kt.stop() << ")" << endl;
-
       break;
     }
   }

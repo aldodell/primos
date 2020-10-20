@@ -744,7 +744,7 @@ OniMatch searchONIByPowerData(unsigned int x, unsigned int y,
       if (pdx.p == p2) {
         return OniMatch(PowerData(x, y, p), pd, pdx);
       }
-    };
+    }
   }
   return OniMatch::empty();
 }

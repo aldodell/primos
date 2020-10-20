@@ -494,6 +494,59 @@
             "problemMatcher": [
                 "$eslint-stylish"
             ]
+        },
+        {
+            "label": "Build factors32",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "kdutils.cpp",
+                "tools/factors32.cpp",
+                "-o",
+                "tools/factors32.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "Build Eleazar with Clang",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++1z",
+                "-stdlib=libc++",
+                "-lgmpxx",
+                "-lgmp",
+                //"-DPRIME_TESTER_LIB=lib",
+                // "-DBIG_GEARS_FACTORIZER_LIB",
+                "-DBIG_HALF_GEAR_FACTORIZER_LIB",
+                "kdutils.cpp",
+                "argumentsHandler.cpp",
+                //"maths_prime.cpp",
+                // "primeTester.cpp",
+                "bigFactorObject.cpp",
+                // "bigGearsFactorizer.cpp",
+                "bigHalfGearFactorizer.cpp",
+                "eleazar.cpp",
+                "-o",
+                "eleazar.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
         }
     ]
 }

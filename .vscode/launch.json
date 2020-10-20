@@ -199,6 +199,16 @@
                 "-y:2",
                 "-powerbuild"
             ]
+        },
+        {
+            "name": "eleazar",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/eleazar.out",
+            "args": [
+                "-n:29",
+            ]
         }
     ]
 }

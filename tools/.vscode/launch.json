@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "factors32",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/factors32.out",
+            "args": [
+                "10"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "oni",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/oni.out",
+            "args": [
+                "-x:10",
+                "-y:2",
+                "-powerbuild"
+            ]
+        },
+        {
+            "name": "eleazar",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "console",
+            "program": "${workspaceRoot}/eleazar.out",
+            "args": [
+                "-n:29",
+            ]
+        }
+    ]
+}
