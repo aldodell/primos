@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "factors32",
             "type": "lldb",
@@ -38,6 +39,27 @@
             "program": "${workspaceRoot}/eleazar.out",
             "args": [
                 "-n:29",
+            ]
+        },
+        {
+            "name": "insumo1",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/insumo1.out",
+            "args": [
+                "-n:29",
+            ]
+        },
+        
+        {
+            "name": "conjetura1",
+            "type": "lldb",
+            "request": "launch",
+            "terminal": "external",
+            "program": "${workspaceRoot}/insumo1.out",
+            "args": [
+                "3",
             ]
         }
     ]
