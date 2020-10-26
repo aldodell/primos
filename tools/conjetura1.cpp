@@ -8,11 +8,18 @@ pero al descomponer los exponentes (restando 1 y dividiendo por 2)
 son todos de la forma 4k+1
 */
 
-/* n = es el número a probar */
+/*
+
+ n = es el número a probar
+ parametros:
+ p1 = número inicial
+ p2 = límite superior
+
+  */
 
 int main(int argc, char *argv[]) {
 
-  vector<unsigned int> factors;
+  vector<unsigned int> factors, commonFactors, primeTable;
   string s;
   unsigned int m, factor1, t, boundry;
   bool all4k1;
@@ -20,83 +27,46 @@ int main(int argc, char *argv[]) {
 
   // Valor inicial
   unsigned int p = atoi(argv[1]);
-  boundry = 10000000;
+  boundry = atoi(argv[2]);
+
+  // Creamos una tabla con números primos que vaya hasta el limite
+  m = 2;
+  primeTable.push_back(m);
+  while (true) {
+    m = nextPrime(m);
+    if (m > p)
+      break;
+    primeTable.push_back(m);
+    m = nextPrime(m);
+  }
 
   while (true) {
-
-    /*
-        // Evaluamos si el número es de la forma 4k+3
-        if (!is4k3(p)) {
-          // printf("%d isn't 4k+3 form\n", n);
-          goto nextN;
-        }
-        */
-
-    // Cambiamos p por p-1/2
-    /*
-    m = (p - 1) / 2;
-    factors.clear();
-    factorizer(m, factors);
-
-    // Revisamos que el valor tenga todos sus factores de la forma 4k+1
-    all4k1 = areAll4k1(factors);
-
-    if (!all4k1) {
-      printf("%d have not all factors with 4k+1 form.\n", n);
-      goto nextN;
-    }
-
-  printf("found: %d(%d)\n", p, m);
-    */
-
     factor1 = (2 * p) + 1;
-
-    if (!isPrime(factor1)) {
-      // printf("2^%d-1; %d factor isn't prime. \n", p, factor1);
-      goto nextN;
-    }
-
-    // printf("2^%d-1; %d factor is prime. \n", p, factor1);
-
-    mpz_ui_pow_ui(mersenne.get_mpz_t(), 2, p);
-    mersenne--;
-
-    if (mpz_divisible_ui_p(mersenne.get_mpz_t(), factor1) != 0) {
-      // printf("2^%d-1 is divisible by %d\n", p, factor1);
-      // printf("%d\n", p);
-      printf("%d : %s\n==============\n", p, is4k1(p) ? "4k+1" : "4k+3");
-      m = (p - 1) / 2;
+    if (isPrime(factor1)) {
       factors.clear();
+      m = (p - 1) / 2;
       factorizer(m, factors);
-      show4kXform(factors);
-      printf("\n");
-
-      // if (std::find(v.begin(), v.end(),value)!=v.end())
-      if (find(factors.begin(), factors.end(), 3) != factors.end()) {
-        printf("HAS 3!\n");
-        break;
+      for (unsigned int f : factors) {
+        if (find(commonFactors.begin(), commonFactors.end(), f) ==
+            commonFactors.end()) {
+          commonFactors.push_back(f);
+        }
       }
-
-      if (is4k1(p)) {
-        printf("is 4k+1\n");
-        break;
-      }
-
-      goto nextN;
     }
 
-    // printf("Is prime? 2^%d-1 isn't divisible by %d\n", p, factor1);
-    // break;
-
-  nextN:
-    p += 2;
-    while (!isPrime(p))
-      p += 2;
+    p = nextPrime(p);
 
     if (p > boundry) {
-      // printf("p=%d\n", p);
+      sort(commonFactors.begin(), commonFactors.end());
+
+      for (unsigned int f :  primeTable) {
+        if (find(commonFactors.begin(), commonFactors.end(), f) ==
+            commonFactors.end()) {
+          printf("%d\n", f);
+        }
+      }
+
       break;
-      boundry += 1000;
     }
   }
 }

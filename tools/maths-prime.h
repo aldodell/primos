@@ -122,10 +122,41 @@ bool isPrime(unsigned int n) {
   return true;
 }
 
+unsigned int nextPrime(unsigned int p) {
+  if (p == 2) {
+    return 3;
+  }
+
+  p += 2;
+  while (!isPrime(p)) {
+    p += 2;
+  }
+  return p;
+}
+
 void show4kXform(vector<unsigned int> factors) {
   for (unsigned int f : factors) {
     printf("%d : %s\n", f, is4k1(f) ? "4k+1" : "4k+3");
   }
 }
+
+/** TODO: Eratosthenes Sieve implementation */
+class erastothenesSieve {
+  // 64 bits
+  vector<unsigned long long> values;
+  unsigned int max;
+  erastothenesSieve(unsigned int max);
+  void markPrime(unsigned int max);
+
+private:
+  unsigned int vectorSize;
+};
+
+erastothenesSieve::erastothenesSieve(unsigned int max) {
+  this->max = max;
+  this->vectorSize = 0;
+}
+
+void erastothenesSieve::markPrime(unsigned int max) {}
 
 #endif
